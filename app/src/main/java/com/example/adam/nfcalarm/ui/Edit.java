@@ -1,13 +1,10 @@
 package com.example.adam.nfcalarm.ui;
 
 import android.app.Activity;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
@@ -19,12 +16,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.R;
+import com.example.adam.nfcalarm.model.AlarmData;
 import com.example.adam.nfcalarm.model.AlarmModel;
 import com.example.adam.nfcalarm.util.Views;
 
@@ -36,7 +33,7 @@ import java.util.Calendar;
 /**
  * Created by adam on 15-12-30.
  */
-public class Edit extends Fragment implements View.OnClickListener{
+public class Edit extends Fragment implements View.OnClickListener {
     public static final String NAME = Edit.class.getSimpleName();
 
     private static final String MODEL_KEY = "modelKey";
@@ -63,9 +60,7 @@ public class Edit extends Fragment implements View.OnClickListener{
     private CheckBox saturday;
 
     private long uniqueID;
-
-    private SharedPreferences sharedPreferences;
-
+    private AlarmData alarmData;
     private JSONArray alarms;
     private int savedModelIndex;
 
@@ -109,29 +104,18 @@ public class Edit extends Fragment implements View.OnClickListener{
 
         setHasOptionsMenu(true);
 
-        sharedPreferences = activity.getSharedPreferences(ApplicationActivity.NAME, Context.MODE_PRIVATE);
+        alarmData = new AlarmData(activity);
 
         // retrieve the model being edited, either in savedinstance or the fragments bundle
         String modelAsString = savedInstanceState != null && savedInstanceState.containsKey(MODEL_KEY) ?
                 savedInstanceState.getString(MODEL_KEY, "") : getArguments().getString(MODEL_KEY, "");
 
-//        AlarmModel alarmModel = new AlarmModel(modelAsString);
         currentModel = new AlarmModel(modelAsString);
         uniqueID = currentModel.uniqueID;
-
-        Toast.makeText(getActivity(), "modelAsString: "+modelAsString, Toast.LENGTH_SHORT).show();
-
-        try {
-            String alarmsAsString = sharedPreferences.getString(ApplicationActivity.ALARM_KEY, "");
-            Toast.makeText(getActivity(), "alarmsAsString: "+alarmsAsString, Toast.LENGTH_LONG).show();
-            alarms = new JSONArray(alarmsAsString);
-            Toast.makeText(getActivity(), "alarms.toString: "+alarms.toString(), Toast.LENGTH_LONG).show();
-        } catch (JSONException e) {
-            e.printStackTrace();
-            alarms = new JSONArray();
-        }
+        alarms = alarmData.toJSONArray();
 
         savedModelIndex = -1;
+        // // TODO: 16-01-19 Investigate, retrieving length may not be viable - JSONArray Null value expected
         int length = alarms.length();
         if (length > 0 && !currentModel.isEmpty) {
             for (int i = 0; i < length; i++) {
@@ -162,32 +146,32 @@ public class Edit extends Fragment implements View.OnClickListener{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Activity activity = getActivity();
-
         if(Views.isActivityNull(activity)) {
             // return if activity destroyed or about to
             return super.onOptionsItemSelected(item);
         }
 
         AlarmModel currentModel = toAlarmModel();
+
+        // // TODO: 16-01-20 investigate use of isUpdated
         boolean isUpdated = false;
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.save:
-                if (!currentModel.isEmpty){
+                if (!currentModel.isEmpty) {
+                    //// TODO: 16-01-20 remove try catch
                     try{
-                        if (savedModelIndex > -1){
-                            Toast.makeText(getActivity(), "savedModelIndex"+String.valueOf(savedModelIndex), Toast.LENGTH_LONG).show();
+                        if (savedModelIndex > -1) {
                             alarms.put(savedModelIndex, currentModel.json);
                         }
                         else {
-                            Toast.makeText(getActivity(), "savedModelIndex"+String.valueOf(savedModelIndex), Toast.LENGTH_LONG).show();
                             alarms.put(currentModel.json);
                         }
 
-                        sharedPreferences.edit().putString(ApplicationActivity.ALARM_KEY, alarms.toString()).apply();
+                        alarmData.setAlarms(alarms);
                         isUpdated = true;
                     }
-                    catch (JSONException e){
+                    catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
@@ -198,7 +182,7 @@ public class Edit extends Fragment implements View.OnClickListener{
             case R.id.delete:
                 if (savedModelIndex > -1) {
                     alarms.remove(savedModelIndex);
-                    sharedPreferences.edit().putString(ApplicationActivity.ALARM_KEY, alarms.toString()).apply();
+                    alarmData.setAlarms(alarms);
                 }
                 isUpdated = true;
                 break;
@@ -257,7 +241,6 @@ public class Edit extends Fragment implements View.OnClickListener{
     }
 
     private AlarmModel toAlarmModel() {
-
         return new AlarmModel(
                 uniqueID,
                 isActive.isChecked(),
@@ -298,6 +281,7 @@ public class Edit extends Fragment implements View.OnClickListener{
                 Toast.makeText(getActivity(), "ONCE" + once.isChecked(), Toast.LENGTH_SHORT).show();
             }
         }
+        //// TODO: 16-01-19 swap declaration of if statements, check if view clicked before once.isChecked
         if (once.isChecked()){
             if (view.equals(sunday) || view.equals(monday) || view.equals(tuesday) || view.equals(wednesday) ||
                     view.equals(thursday) || view.equals(friday) || view.equals(saturday)){

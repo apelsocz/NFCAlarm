@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.R;
+import com.example.adam.nfcalarm.model.AlarmData;
 import com.example.adam.nfcalarm.model.AlarmModel;
 import com.example.adam.nfcalarm.util.Views;
 
@@ -165,36 +166,13 @@ public class Alarms extends Fragment {
 
     private RecyclerView list;
     private FloatingActionButton fab;
-
-    private List<AlarmModel> getAlarms(Activity activity) {
-        List<AlarmModel> models = new ArrayList<>();
-
-        String alarmsAsString = activity.getPreferences(Context.MODE_PRIVATE)
-                .getString(ApplicationActivity.ALARM_KEY, "");
-
-        JSONArray alarms = new JSONArray();
-        try {
-            alarms = new JSONArray(alarmsAsString);
-            int alarmsLength = alarms.length();
-
-            for (int i = 0; i < alarmsLength; i++) {
-                models.add(new AlarmModel(alarms.optString(i)));
-            }
-        }
-        catch (JSONException e) {
-            // not interested
-            e.printStackTrace();
-        }
-
-        return models;
-    }
+    private AlarmData alarmData;
 
     public void update() {
-        // read from sharedpreferences directly
         Activity activity = getActivity();
 
         if (!Views.isActivityNull(activity)) {
-            List<AlarmModel> models = getAlarms(activity);
+            List<AlarmModel> models = alarmData.toList();
 
             if (models.size() == 0) {
                 //no data - add 'null' to fetch R.layout.alarms_empty_cell
@@ -208,21 +186,15 @@ public class Alarms extends Fragment {
     public void toggleAlarm(AlarmModel model, int position){
         Activity activity = getActivity();
 
-        JSONArray alarms = new JSONArray();
-        SharedPreferences sharedPreferences = activity.getPreferences(Context.MODE_PRIVATE);
-
+        JSONArray alarms = alarmData.toJSONArray();
         try {
-            String alarmsAsString = sharedPreferences.getString(ApplicationActivity.ALARM_KEY, "");
-            alarms = new JSONArray(alarmsAsString);
             alarms.put(position, model.json);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        sharedPreferences.edit().putString(ApplicationActivity.ALARM_KEY, alarms.toString()).apply();
-
-        List<AlarmModel> models = getAlarms(activity);
-        list.swapAdapter(new Adapter(activity, models), false);
+        alarmData.setAlarms(alarms);
+        list.swapAdapter(new Adapter(activity, alarmData.toList()), false);
     }
 
     @Override
@@ -269,6 +241,8 @@ public class Alarms extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        alarmData = new AlarmData(getActivity());
 
         list = (RecyclerView) view;
         list.setHasFixedSize(true);
