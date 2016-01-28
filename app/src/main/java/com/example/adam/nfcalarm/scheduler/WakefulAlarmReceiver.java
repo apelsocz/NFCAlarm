@@ -9,6 +9,9 @@ import android.content.pm.PackageManager;
 import android.provider.AlarmClock;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
+import com.example.adam.nfcalarm.ApplicationActivity;
+import com.example.adam.nfcalarm.model.AlarmData;
+
 import java.util.Calendar;
 
 /**
@@ -25,38 +28,34 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
 //        Intent service = new Intent(context, AlarmSchedulingService.class);
     }
 
+    public void setAlarm(Context context) {
+        alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, WakefulAlarmReceiver.class);
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
-//    public void setAlarm(Context context) {
-//        alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-//        Intent intent = new Intent(context, WakefulAlarmReceiver.class);
-//        intent.
-//        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-//
-//        // // TODO: 16-01-17
-//        // use calendar object to DAYOFWEEK + 1,2,3 for repeating.
-//
-//        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-//                AlarmManager.INTERVAL_DAY, alarmIntent);
-//
-//        ComponentName receiver = new ComponentName(context, AlarmBootReceiver.class);
-//        PackageManager pm = context.getPackageManager();
-//
-//        pm.setComponentEnabledSetting(receiver,
-//                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-//                PackageManager.DONT_KILL_APP);
-//    }
-//
-//    public void cancelAlarm(Context context) {
-//        if(alarmMgr != null) {
-//            alarmMgr.cancel(alarmIntent);
-//            alarmMgr.can
-//        }
-//
-//        ComponentName receiver = new ComponentName(context, SampleBootReceiver.class);
-//        PackageManager pm = context.getPackageManager();
-//
-//        pm.setComponentEnabledSetting(receiver,
-//                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-//                PackageManager.DONT_KILL_APP);
-//    }
+        // // TODO: 16-01-17
+        // set next repeating
+
+        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, alarmIntent);
+
+        ComponentName receiver = new ComponentName(context, AlarmBootReceiver.class);
+        PackageManager pm = context.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
+    public void cancelAlarm(Context context) {
+        if(alarmMgr != null) {
+            alarmMgr.cancel(alarmIntent);
+        }
+
+        ComponentName receiver = new ComponentName(context, AlarmBootReceiver.class);
+        PackageManager pm = context.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+    }
 }

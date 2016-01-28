@@ -21,10 +21,11 @@ public class AlarmData {
     private SharedPreferences sharedPreferences;
     private JSONArray alarms;
 
-    public AlarmData(Activity activity) {
-        if (!Views.isActivityNull(activity)) {
-            sharedPreferences = activity.getSharedPreferences(ApplicationActivity.NAME, Context.MODE_PRIVATE);
-        }
+    public AlarmData() {
+        Activity activity = new Activity();
+        sharedPreferences = activity.getSharedPreferences(ApplicationActivity.NAME, Context.MODE_PRIVATE);
+        //// TODO: 16-01-27 remove instantiation of AlarmData and proceeding readPreferences
+            readPreferences();
     }
 
     public JSONArray toJSONArray() {

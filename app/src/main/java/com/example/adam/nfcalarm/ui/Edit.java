@@ -104,7 +104,7 @@ public class Edit extends Fragment implements View.OnClickListener {
 
         setHasOptionsMenu(true);
 
-        alarmData = new AlarmData(activity);
+        alarmData = new AlarmData();
 
         // retrieve the model being edited, either in savedinstance or the fragments bundle
         String modelAsString = savedInstanceState != null && savedInstanceState.containsKey(MODEL_KEY) ?

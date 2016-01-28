@@ -242,7 +242,7 @@ public class Alarms extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        alarmData = new AlarmData(getActivity());
+        alarmData = new AlarmData();
 
         list = (RecyclerView) view;
         list.setHasFixedSize(true);
