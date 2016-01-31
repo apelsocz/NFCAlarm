@@ -16,7 +16,9 @@ import android.view.MenuItem;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.adam.nfcalarm.model.AlarmData;
 import com.example.adam.nfcalarm.model.AlarmModel;
+import com.example.adam.nfcalarm.scheduler.WakefulAlarmReceiver;
 import com.example.adam.nfcalarm.ui.Alarms;
 import com.example.adam.nfcalarm.ui.Content;
 import com.example.adam.nfcalarm.ui.Edit;
@@ -30,6 +32,8 @@ public class ApplicationActivity extends AppCompatActivity {
      * Key which keeps all alarms in shared preferences
      */
     public static final String ALARM_KEY = "alarmKey";
+
+    private WakefulAlarmReceiver alarmReceiver = new WakefulAlarmReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +117,15 @@ public class ApplicationActivity extends AppCompatActivity {
         Alarms alarms = (Alarms) getSupportFragmentManager().findFragmentByTag(Alarms.NAME);
         if (alarms != null) {
             alarms.toggleAlarm(model, position);
+        }
+    }
+
+    public void scheduleNextAlarm(boolean scheduleAlarm) {
+        if (scheduleAlarm) {
+            alarmReceiver.setAlarm(this);
+        }
+        else if (!scheduleAlarm) {
+            alarmReceiver.cancelAlarm(this);
         }
     }
 }

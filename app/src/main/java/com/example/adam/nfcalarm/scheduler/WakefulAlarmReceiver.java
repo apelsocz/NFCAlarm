@@ -35,6 +35,7 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
 
         // // TODO: 16-01-17
         // set next repeating
+        AlarmClock alarmClock = new AlarmClock();
 
         alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, alarmIntent);

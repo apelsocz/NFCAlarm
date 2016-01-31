@@ -3,6 +3,8 @@ package com.example.adam.nfcalarm.model;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.provider.AlarmClock;
+import android.text.method.HideReturnsTransformationMethod;
 
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.util.Views;
@@ -20,12 +22,14 @@ public class AlarmData {
 
     private SharedPreferences sharedPreferences;
     private JSONArray alarms;
+    private Activity activity;
 
     public AlarmData() {
-        Activity activity = new Activity();
+        activity = new Activity();
         sharedPreferences = activity.getSharedPreferences(ApplicationActivity.NAME, Context.MODE_PRIVATE);
         //// TODO: 16-01-27 remove instantiation of AlarmData and proceeding readPreferences
-            readPreferences();
+
+        readPreferences();
     }
 
     public JSONArray toJSONArray() {
@@ -57,6 +61,16 @@ public class AlarmData {
         } catch (JSONException e) {
             e.printStackTrace();
             alarms = new JSONArray();
+        }
+
+        //// TODO: 16-01-30 may be leaking code, investigate how to call intelligently
+        if( !Views.isActivityNull(activity) ){
+            if (alarms.length() > 0) {
+                ((ApplicationActivity)activity).scheduleNextAlarm(true);
+            }
+            else if (alarms.length() == 0){
+                ((ApplicationActivity)activity).scheduleNextAlarm(false);
+            }
         }
     }
 }

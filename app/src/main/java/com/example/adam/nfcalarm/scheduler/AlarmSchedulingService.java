@@ -53,7 +53,8 @@ public class AlarmSchedulingService extends IntentService {
                     .setSmallIcon(R.drawable.icon_nfc)
                     .setContentTitle(getString(R.string.app_name))
                     .setStyle(new NotificationCompat.BigTextStyle()
-                    .bigText(msg + "{Big Text}"))
+                        .bigText(msg + "{Big Text}"))
+//                    .setFullScreenIntent()
                     .setContentText(msg + "{Context Text}");
 
         mBuilder.setContentIntent(contentIntent);
