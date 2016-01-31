@@ -9,11 +9,6 @@ import android.content.pm.PackageManager;
 import android.provider.AlarmClock;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
-import com.example.adam.nfcalarm.ApplicationActivity;
-import com.example.adam.nfcalarm.model.AlarmData;
-
-import java.util.Calendar;
-
 /**
  * Created by adam on 16-01-17.
  */
@@ -24,7 +19,6 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         //// TODO: 16-01-17
-        // retrieves doodle , may be necessary to perform work later.
 //        Intent service = new Intent(context, AlarmSchedulingService.class);
     }
 

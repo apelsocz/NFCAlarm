@@ -3,8 +3,6 @@ package com.example.adam.nfcalarm.model;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.provider.AlarmClock;
-import android.text.method.HideReturnsTransformationMethod;
 
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.util.Views;
@@ -66,10 +64,10 @@ public class AlarmData {
         //// TODO: 16-01-30 may be leaking code, investigate how to call intelligently
         if( !Views.isActivityNull(activity) ){
             if (alarms.length() > 0) {
-                ((ApplicationActivity)activity).scheduleNextAlarm(true);
+                ((ApplicationActivity)activity).doAlarmSchedule(true);
             }
             else if (alarms.length() == 0){
-                ((ApplicationActivity)activity).scheduleNextAlarm(false);
+                ((ApplicationActivity)activity).doAlarmSchedule(false);
             }
         }
     }

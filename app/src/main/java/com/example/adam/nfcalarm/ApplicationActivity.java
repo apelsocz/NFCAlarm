@@ -120,7 +120,7 @@ public class ApplicationActivity extends AppCompatActivity {
         }
     }
 
-    public void scheduleNextAlarm(boolean scheduleAlarm) {
+    public void doAlarmSchedule(boolean scheduleAlarm) {
         if (scheduleAlarm) {
             alarmReceiver.setAlarm(this);
         }

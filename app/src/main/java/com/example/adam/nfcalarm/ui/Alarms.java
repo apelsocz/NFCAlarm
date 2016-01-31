@@ -168,35 +168,6 @@ public class Alarms extends Fragment {
     private FloatingActionButton fab;
     private AlarmData alarmData;
 
-    public void update() {
-        Activity activity = getActivity();
-
-        if (!Views.isActivityNull(activity)) {
-            List<AlarmModel> models = alarmData.toList();
-
-            if (models.size() == 0) {
-                //no data - add 'null' to fetch R.layout.alarms_empty_cell
-                models.add(AlarmModel.EMPTY);
-            }
-
-            list.setAdapter(new Adapter(activity, models));
-        }
-    }
-
-    public void toggleAlarm(AlarmModel model, int position){
-        Activity activity = getActivity();
-
-        JSONArray alarms = alarmData.toJSONArray();
-        try {
-            alarms.put(position, model.json);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        alarmData.setAlarms(alarms);
-        list.swapAdapter(new Adapter(activity, alarmData.toList()), false);
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -252,6 +223,35 @@ public class Alarms extends Fragment {
         setHasOptionsMenu(true);
 
         update();
+    }
+
+    public void update() {
+        Activity activity = getActivity();
+
+        if (!Views.isActivityNull(activity)) {
+            List<AlarmModel> models = alarmData.toList();
+
+            if (models.size() == 0) {
+                //no data - add 'null' to fetch R.layout.alarms_empty_cell
+                models.add(AlarmModel.EMPTY);
+            }
+
+            list.setAdapter(new Adapter(activity, models));
+        }
+    }
+
+    public void toggleAlarm(AlarmModel model, int position){
+        Activity activity = getActivity();
+
+        JSONArray alarms = alarmData.toJSONArray();
+        try {
+            alarms.put(position, model.json);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        alarmData.setAlarms(alarms);
+        list.swapAdapter(new Adapter(activity, alarmData.toList()), false);
     }
 }
 
