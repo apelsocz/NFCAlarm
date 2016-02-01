@@ -41,6 +41,7 @@ public class AlarmData {
         for (AlarmModel currentModel : currentList) {
             if (currentModel.isActive) {
                 scheduledAlarm = true;
+                break;
             }
         }
         ((ApplicationActivity)appActivity).doAlarmSchedule(scheduledAlarm);

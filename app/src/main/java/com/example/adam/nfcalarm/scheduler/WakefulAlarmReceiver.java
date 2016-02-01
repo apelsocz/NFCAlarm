@@ -53,14 +53,12 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 21);
         calendar.setTimeZone(TimeZone.getDefault());
 
         //// TODO: 16-01-31 find next alarm and set
 //        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
 //                AlarmManager.INTERVAL_DAY, alarmIntent);
-        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
+        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis()+1000, alarmIntent);
         Toast.makeText(context, "WakefulAlarmReceiver.setAlarm()", Toast.LENGTH_SHORT).show();
 
         // Enable {@code SampleBootReceiver} to automatically restart the alarm when the

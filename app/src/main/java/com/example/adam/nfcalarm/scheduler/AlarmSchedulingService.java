@@ -43,17 +43,17 @@ public class AlarmSchedulingService extends IntentService {
     
     private void sendNotification(String msg) {
         NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-    
+
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-            new Intent(this, ApplicationActivity.class), 0);
+                new Intent(this, ApplicationActivity.class), 0);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                     .setSmallIcon(R.drawable.icon_nfc)
                     .setContentTitle(getString(R.string.app_name))
                     .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(msg + "{Big Text}"))
-//                    .setFullScreenIntent()
-                    .setContentText(msg + "{Context Text}");
+                    .setFullScreenIntent(contentIntent, false)
+                    .setContentText(msg + "Alarm Ringing");
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
