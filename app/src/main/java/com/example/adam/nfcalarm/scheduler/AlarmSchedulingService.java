@@ -19,7 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * This {@code IntentService} does the app's actual work.
+ * This {@code IntentService} does the app's actual work. <p>
  * {@code WakefulAlarmReceiver} (a {@code WakefulBroadcastReceiver}) holds a
  * partial wake lock for this service while the service does its work. When the
  * service is finished, it calls {@code completeWakefulIntent()} to release the
@@ -39,10 +39,8 @@ public class AlarmSchedulingService extends IntentService {
         sendNotification(TAG);
         // Release the wake lock provided by the BroadcastReceiver.
         WakefulAlarmReceiver.completeWakefulIntent(intent);
-        // END_INCLUDE(service_onhandle)
     }
     
-    // Post a notification indicating whether a doodle was found.
     private void sendNotification(String msg) {
         NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
     

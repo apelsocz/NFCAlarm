@@ -1,8 +1,11 @@
 package com.example.adam.nfcalarm.model;
 
 import android.app.Activity;
+import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.util.Views;
@@ -20,14 +23,27 @@ public class AlarmData {
 
     private SharedPreferences sharedPreferences;
     private JSONArray alarms;
-    private Activity activity;
+    private Activity appActivity;
 
-    public AlarmData() {
-        activity = new Activity();
+    public AlarmData(Activity activity) {
+        appActivity = activity;
         sharedPreferences = activity.getSharedPreferences(ApplicationActivity.NAME, Context.MODE_PRIVATE);
         //// TODO: 16-01-27 remove instantiation of AlarmData and proceeding readPreferences
-
         readPreferences();
+    }
+
+    public void setAlarms(JSONArray json) {
+        sharedPreferences.edit().putString(ApplicationActivity.ALARM_KEY, json.toString()).apply();
+        List<AlarmModel> currentList = toList();
+
+        // enable / disable WakefulAlarmReceiver via ApplicationActivity
+        boolean scheduledAlarm = false;
+        for (AlarmModel currentModel : currentList) {
+            if (currentModel.isActive) {
+                scheduledAlarm = true;
+            }
+        }
+        ((ApplicationActivity)appActivity).doAlarmSchedule(scheduledAlarm);
     }
 
     public JSONArray toJSONArray() {
@@ -47,10 +63,6 @@ public class AlarmData {
         return models;
     }
 
-    public void setAlarms(JSONArray json) {
-        sharedPreferences.edit().putString(ApplicationActivity.ALARM_KEY, json.toString()).apply();
-    }
-
     private void readPreferences() {
         String alarmsAsString = sharedPreferences.getString(ApplicationActivity.ALARM_KEY, "");
 
@@ -59,16 +71,6 @@ public class AlarmData {
         } catch (JSONException e) {
             e.printStackTrace();
             alarms = new JSONArray();
-        }
-
-        //// TODO: 16-01-30 may be leaking code, investigate how to call intelligently
-        if( !Views.isActivityNull(activity) ){
-            if (alarms.length() > 0) {
-                ((ApplicationActivity)activity).doAlarmSchedule(true);
-            }
-            else if (alarms.length() == 0){
-                ((ApplicationActivity)activity).doAlarmSchedule(false);
-            }
         }
     }
 }

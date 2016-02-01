@@ -173,7 +173,6 @@ public class Alarms extends Fragment {
         super.onStart();
 
         final Activity activity = getActivity();
-
         if (!Views.isActivityNull(activity)) {
             fab = (FloatingActionButton) activity.findViewById(R.id.floating_action_btn);
             fab.setOnClickListener(new View.OnClickListener() {
@@ -213,7 +212,7 @@ public class Alarms extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        alarmData = new AlarmData();
+        alarmData = new AlarmData(getActivity());
 
         list = (RecyclerView) view;
         list.setHasFixedSize(true);
