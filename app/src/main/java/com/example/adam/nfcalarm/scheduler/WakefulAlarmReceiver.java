@@ -55,13 +55,15 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.setTimeZone(TimeZone.getDefault());
 
+//        calendar.add(Calendar.SECOND, 10);
+
         //// TODO: 16-01-31 find next alarm and set
 //        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
 //                AlarmManager.INTERVAL_DAY, alarmIntent);
-        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis()+1000, alarmIntent);
-        Toast.makeText(context, "WakefulAlarmReceiver.setAlarm()", Toast.LENGTH_SHORT).show();
+        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
+//        Toast.makeText(context, "WakefulAlarmReceiver.setAlarm()", Toast.LENGTH_SHORT).show();
 
-        // Enable {@code SampleBootReceiver} to automatically restart the alarm when the
+        // Enable {@code AlarmBootReceiver} to automatically restart the alarm when the
         // device is rebooted.
         ComponentName receiver = new ComponentName(context, AlarmBootReceiver.class);
         PackageManager pm = context.getPackageManager();
@@ -74,17 +76,13 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         if(alarmMgr != null) {
             alarmMgr.cancel(alarmIntent);
         }
-        Toast.makeText(context, "WakefulAlarmReceiver.cancelAlarm()", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(context, "WakefulAlarmReceiver.cancelAlarm()", Toast.LENGTH_SHORT).show();
 
-        // Disable {@code SampleBootReceiver} so that it doesn't automatically restart the
+        // Disable {@code AlarmBootReceiver} so that it doesn't automatically restart the
         // alarm when the device is rebooted.
         ComponentName receiver = new ComponentName(context, AlarmBootReceiver.class);
         PackageManager pm = context.getPackageManager();
         pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
-    }
-
-    private void notifyDebug() {
-
     }
 }

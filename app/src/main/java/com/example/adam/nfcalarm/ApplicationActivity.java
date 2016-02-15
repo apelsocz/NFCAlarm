@@ -39,6 +39,13 @@ public class ApplicationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+////        Bundle b = getIntent().getExtras();
+//        Bundle b = savedInstanceState;
+//
+//        if (b != null) {
+////            Toast.makeText(getApplicationContext(), b.toString(), Toast.LENGTH_SHORT).show();
+//        }
+
         setContentView(R.layout.activity_application);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
@@ -51,6 +58,8 @@ public class ApplicationActivity extends AppCompatActivity {
                     .commit();
             Toast.makeText(getApplicationContext(), "savedInstance NULL", Toast.LENGTH_SHORT).show();
         }
+
+//        Intent intent = getIntent()
     }
 
     @Override
@@ -113,10 +122,6 @@ public class ApplicationActivity extends AppCompatActivity {
         }
     }
 
-    public static final void doTest(){
-
-    }
-
     public void onActiveToggle(AlarmModel model, int position) {
         Alarms alarms = (Alarms) getSupportFragmentManager().findFragmentByTag(Alarms.NAME);
         if (alarms != null) {
@@ -125,8 +130,8 @@ public class ApplicationActivity extends AppCompatActivity {
     }
 
     public void doAlarmSchedule(boolean scheduleAlarm) {
-        Toast.makeText(getApplicationContext(), "ApplicationActivity.doAlarmSchedule("+scheduleAlarm+")",
-                Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "ApplicationActivity.doAlarmSchedule("+scheduleAlarm+")",
+//                Toast.LENGTH_SHORT).show();
         if (scheduleAlarm) {
             alarmReceiver.setAlarm(this);
         }

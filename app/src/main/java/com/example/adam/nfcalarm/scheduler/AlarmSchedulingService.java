@@ -1,22 +1,20 @@
 package com.example.adam.nfcalarm.scheduler;
 
+import android.app.Application;
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.provider.AlarmClock;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
+import android.support.v4.app.TaskStackBuilder;
 
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.R;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.Calendar;
 
 /**
  * This {@code IntentService} does the app's actual work. <p>
@@ -36,13 +34,38 @@ public class AlarmSchedulingService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
         sendNotification(TAG);
+//        notify(TAG);
+//        Bundle b = new Bundle();
+//        b.putString(TAG, TAG);
+//        intent.putExtras(b);
+
         // Release the wake lock provided by the BroadcastReceiver.
-        WakefulAlarmReceiver.completeWakefulIntent(intent);
+        // // TODO: 16-02-08 add boolean while notification active
+        //// TODO: 16-02-14 call method from ResultActivity.class
+//        WakefulAlarmReceiver.completeWakefulIntent(intent);
+
+//        Intent activityIntent = new Intent(getBaseContext(), ApplicationActivity.class);
+//        activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        getApplication().startActivity(activityIntent);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+
+        Intent activityIntent = new Intent(AlarmClock.ACTION_SET_ALARM);
+        activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activityIntent.putExtra(AlarmClock.EXTRA_MESSAGE, "AlarmClock content provider");
+        activityIntent.putExtra(AlarmClock.EXTRA_HOUR, calendar.get(Calendar.HOUR_OF_DAY));
+        activityIntent.putExtra(AlarmClock.EXTRA_MINUTES, calendar.get(Calendar.MINUTE)+1);
+        activityIntent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+
+        getApplication().startActivity(activityIntent);
     }
     
     private void sendNotification(String msg) {
-        NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(
+                Context.NOTIFICATION_SERVICE);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, ApplicationActivity.class), 0);
@@ -53,9 +76,43 @@ public class AlarmSchedulingService extends IntentService {
                     .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(msg + "{Big Text}"))
                     .setFullScreenIntent(contentIntent, false)
-                    .setContentText(msg + "Alarm Ringing");
+                    .setContentText(msg)
+                    .setOngoing(true);
 
         mBuilder.setContentIntent(contentIntent);
+        Notification notification = mBuilder.build();
+        startForeground(NOTIFICATION_ID, mBuilder.build());
+    }
+
+    private void notify(String msg) {
+        // TODO http://developer.android.com/guide/topics/ui/notifiers/notifications.html#DirectEntry
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.icon_nfc)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(msg);
+
+        mBuilder.setAutoCancel(false);
+        mBuilder.setOngoing(true);
+        mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
+        
+        // Explicit intent
+        Intent resultIntent = new Intent(this, ApplicationActivity.class);
+//        Intent resultIntent = new Intent(this, ResultActivity.class);
+
+        // artificial back stack for started Activity - ensures navigating backwards from Activity
+        // leads out of application to homescreen
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(ApplicationActivity.class);
+//        stackBuilder.addParentStack(ResultActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setContentIntent(resultPendingIntent);
+
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 }
