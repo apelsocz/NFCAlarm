@@ -20,6 +20,8 @@ import java.util.List;
  * Created by adam on 16-01-18.
  */
 public class AlarmData {
+    public static final String EXTRA_HOUR = "com.example.adam.nfcalarm.model.HOUR";
+    public static final String EXTRA_MINUTE = "com.example.adam.nfcalarm.model.MINUTE";
 
     private SharedPreferences sharedPreferences;
     private JSONArray alarms;

@@ -1,13 +1,12 @@
 <resources>
     <string name="app_name">NFC Alarm</string>
     <string name="title_activity_application">ApplicationActivity</string>
+    <string name="title_activity_alarm">AlarmActivity</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
-
-
 
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>

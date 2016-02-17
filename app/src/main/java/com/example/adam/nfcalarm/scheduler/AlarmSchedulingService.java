@@ -1,20 +1,16 @@
 package com.example.adam.nfcalarm.scheduler;
 
-import android.app.Application;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.provider.AlarmClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-
 import com.example.adam.nfcalarm.ApplicationActivity;
+import com.example.adam.nfcalarm.AlarmActivity;
 import com.example.adam.nfcalarm.R;
-
-import java.util.Calendar;
 
 /**
  * This {@code IntentService} does the app's actual work. <p>
@@ -47,20 +43,23 @@ public class AlarmSchedulingService extends IntentService {
 //        WakefulAlarmReceiver.completeWakefulIntent(intent);
 
 //        Intent activityIntent = new Intent(getBaseContext(), ApplicationActivity.class);
-//        activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        getApplication().startActivity(activityIntent);
+        Intent activityIntent = new Intent(getBaseContext(), AlarmActivity.class);
+        activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getApplication().startActivity(activityIntent);
 
-        Calendar calendar = Calendar.getInstance();
+/*        Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
 
         Intent activityIntent = new Intent(AlarmClock.ACTION_SET_ALARM);
+
         activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         activityIntent.putExtra(AlarmClock.EXTRA_MESSAGE, "AlarmClock content provider");
         activityIntent.putExtra(AlarmClock.EXTRA_HOUR, calendar.get(Calendar.HOUR_OF_DAY));
         activityIntent.putExtra(AlarmClock.EXTRA_MINUTES, calendar.get(Calendar.MINUTE)+1);
         activityIntent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
 
-        getApplication().startActivity(activityIntent);
+        getApplication().startActivity(activityIntent);*/
+
     }
     
     private void sendNotification(String msg) {
@@ -78,6 +77,8 @@ public class AlarmSchedulingService extends IntentService {
                     .setFullScreenIntent(contentIntent, false)
                     .setContentText(msg)
                     .setOngoing(true);
+
+        mBuilder.setCategory(NotificationCompat.CATEGORY_ALARM);
 
         mBuilder.setContentIntent(contentIntent);
         Notification notification = mBuilder.build();

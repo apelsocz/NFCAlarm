@@ -21,6 +21,15 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".AlarmActivity"
+            android:label="AlarmActivity"
+            android:parentActivityName=".ApplicationActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ApplicationActivity" />
+        </activity>
+
         <receiver android:name=".scheduler.WakefulAlarmReceiver"/>
 
         <receiver android:name=".scheduler.AlarmBootReceiver"
