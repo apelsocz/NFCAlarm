@@ -1,12 +1,5 @@
 package com.example.adam.nfcalarm;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,8 +16,7 @@ import com.example.adam.nfcalarm.ui.Alarms;
 import com.example.adam.nfcalarm.ui.Content;
 import com.example.adam.nfcalarm.ui.Edit;
 
-import org.json.JSONArray;
-import org.json.JSONException;
+import net.danlew.android.joda.JodaTimeAndroid;
 
 public class ApplicationActivity extends AppCompatActivity {
     public static final String NAME = ApplicationActivity.class.getSimpleName();
@@ -38,13 +30,7 @@ public class ApplicationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-////        Bundle b = getIntent().getExtras();
-//        Bundle b = savedInstanceState;
-//
-//        if (b != null) {
-////            Toast.makeText(getApplicationContext(), b.toString(), Toast.LENGTH_SHORT).show();
-//        }
+        JodaTimeAndroid.init(this);
 
         setContentView(R.layout.activity_application);
 
@@ -58,8 +44,6 @@ public class ApplicationActivity extends AppCompatActivity {
                     .commit();
             Toast.makeText(getApplicationContext(), "savedInstance NULL", Toast.LENGTH_SHORT).show();
         }
-
-//        Intent intent = getIntent()
     }
 
     @Override
@@ -130,13 +114,18 @@ public class ApplicationActivity extends AppCompatActivity {
     }
 
     public void doAlarmSchedule(boolean scheduleAlarm) {
-//        Toast.makeText(getApplicationContext(), "ApplicationActivity.doAlarmSchedule("+scheduleAlarm+")",
-//                Toast.LENGTH_SHORT).show();
         if (scheduleAlarm) {
             alarmReceiver.setAlarm(this);
+            AlarmData alarmData = new AlarmData(getApplicationContext());
+//            alarmReceiver.setNextAlarmInMillis(alarmData.getNextAlarmInMillis());
         }
         else if (!scheduleAlarm) {
             alarmReceiver.cancelAlarm(this);
+//            alarmReceiver.setNextAlarmInMillis(AlarmData.NO_ALARMS);
         }
+    }
+
+    public AppCompatActivity getApplicationActivity() {
+        return this;
     }
 }

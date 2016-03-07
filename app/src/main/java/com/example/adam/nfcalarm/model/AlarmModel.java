@@ -1,18 +1,22 @@
 package com.example.adam.nfcalarm.model;
 
-import android.os.SystemClock;
 import android.text.TextUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.Objects;
 
-/**
- * Created by adam on 15-12-26.
- */
 public class AlarmModel {
     public static final AlarmModel EMPTY = new AlarmModel(null);
+    public static final int SUNDAY = Calendar.SUNDAY;
+    public static final int MONDAY = Calendar.MONDAY;
+    public static final int TUESDAY = Calendar.TUESDAY;
+    public static final int WEDNESDAY = Calendar.WEDNESDAY;
+    public static final int THURSDAY = Calendar.THURSDAY;
+    public static final int FRIDAY = Calendar.FRIDAY;
+    public static final int SATURDAY = Calendar.SATURDAY;
 
     public final JSONObject json;
     public final String hour;
@@ -21,7 +25,7 @@ public class AlarmModel {
     public final boolean sunday;
     public final boolean monday;
     public final boolean tuesday;
-    public final boolean wendesnday;
+    public final boolean wednesday;
     public final boolean thursday;
     public final boolean friday;
     public final boolean saturday;
@@ -48,7 +52,7 @@ public class AlarmModel {
         sunday = json.optBoolean("alarmSun", false);
         monday = json.optBoolean("alarmMon", false);
         tuesday = json.optBoolean("alarmTue", false);
-        wendesnday = json.optBoolean("alarmWed", false);
+        wednesday = json.optBoolean("alarmWed", false);
         thursday = json.optBoolean("alarmThu", false);
         friday = json.optBoolean("alarmFri", false);
         saturday = json.optBoolean("alarmSat", false);
@@ -72,7 +76,7 @@ public class AlarmModel {
         this.sunday = sunday;
         this.monday = monday;
         this.tuesday = tuesday;
-        this.wendesnday = wednesday;
+        this.wednesday = wednesday;
         this.thursday = thursday;
         this.friday = friday;
         this.saturday = saturday;
@@ -88,7 +92,7 @@ public class AlarmModel {
             json.put("alarmSun", !this.once && this.sunday);
             json.put("alarmMon", !this.once && this.monday);
             json.put("alarmTue", !this.once && this.tuesday);
-            json.put("alarmWed", !this.once && this.wendesnday);
+            json.put("alarmWed", !this.once && this.wednesday);
             json.put("alarmThu", !this.once && this.thursday);
             json.put("alarmFri", !this.once && this.friday);
             json.put("alarmSat", !this.once && this.saturday);

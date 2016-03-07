@@ -1,8 +1,6 @@
 package com.example.adam.nfcalarm.ui;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -104,7 +102,8 @@ public class Edit extends Fragment implements View.OnClickListener {
 
         setHasOptionsMenu(true);
 
-        alarmData = new AlarmData(activity);
+//        alarmData = new AlarmData(activity);
+        alarmData = new AlarmData(activity.getApplicationContext());
 
         // retrieve the model being edited, either in savedinstance or the fragments bundle
         String modelAsString = savedInstanceState != null && savedInstanceState.containsKey(MODEL_KEY) ?
@@ -218,16 +217,20 @@ public class Edit extends Fragment implements View.OnClickListener {
             sunday.setChecked(model.sunday);
             monday.setChecked(model.monday);
             tuesday.setChecked(model.tuesday);
-            wednesday.setChecked(model.wendesnday);
+            wednesday.setChecked(model.wednesday);
             thursday.setChecked(model.thursday);
             friday.setChecked(model.friday);
             saturday.setChecked(model.saturday);
         }
         else {
             isActive.setChecked(false);
-            picker.setHour((Calendar.getInstance()).get(
-                    DateFormat.is24HourFormat(getActivity()) ? Calendar.HOUR_OF_DAY : Calendar.HOUR
-            ));
+            // TODO take steps for picker being shown as 24 hour / if 12 hour AM PM should be set
+            /*picker.setHour((Calendar.getInstance())
+                    .get(DateFormat.is24HourFormat(getActivity()) ? Calendar.HOUR_OF_DAY : Calendar.HOUR
+            ));*/
+            picker.setHour((Calendar.getInstance())
+                    .get(DateFormat.is24HourFormat(getActivity()) ? Calendar.HOUR_OF_DAY : Calendar.HOUR
+                    ));
             picker.setMinute(((Calendar.getInstance()).get(Calendar.MINUTE)));
             once.setChecked(true);
             sunday.setChecked(false);
@@ -269,6 +272,9 @@ public class Edit extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
+        //// TODO: 16-03-06
+        // validation required, a radio box must always be selected. dont allow toggle if it
+        // would result in no radio boxes being selected
         if (view.equals(once)) {
             if (once.isChecked() ) {
                 sunday.setChecked(false);

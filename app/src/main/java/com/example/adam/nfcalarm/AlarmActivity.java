@@ -1,20 +1,22 @@
 package com.example.adam.nfcalarm;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.WindowManager;
 
 import com.example.adam.nfcalarm.ui.PlaceholderFragment;
 
-/**
- * Created by adam on 16-02-16.
- */
+import net.danlew.android.joda.JodaTimeAndroid;
+
 public class AlarmActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        JodaTimeAndroid.init(this);
+
         setContentView(R.layout.activity_alarm);
 
         if (savedInstanceState == null) {
@@ -23,6 +25,8 @@ public class AlarmActivity extends AppCompatActivity {
         }
 
         Intent intent = getIntent();
+
+        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
     }
 
 /*    @Override

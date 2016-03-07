@@ -1,32 +1,23 @@
 package com.example.adam.nfcalarm.ui;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.R;
@@ -37,12 +28,7 @@ import com.example.adam.nfcalarm.util.Views;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.text.Format;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
-import java.util.Formatter;
 import java.util.List;
 
 /**
@@ -74,7 +60,8 @@ public class Alarms extends Fragment {
 
             Context context = this.itemView.getContext();
 
-            if (DateFormat.is24HourFormat(context)) {
+            time.setText(model.hour + ":" + model.minute);
+/*            if (DateFormat.is24HourFormat(context)) {
                 time.setText(model.hour + ":" + model.minute);
             }
             else {
@@ -83,7 +70,7 @@ public class Alarms extends Fragment {
                 int hour = Integer.parseInt(this.model.hour);
                 hour = hour > 12 ? hour - 12 : hour;
                 time.setText(hour +":"+ model.minute);
-            }
+            }*/
             isActive.setChecked(model.isActive);
 
             isActive.setOnClickListener(this);
@@ -102,7 +89,7 @@ public class Alarms extends Fragment {
 //                    AlarmModel currentModel = new AlarmModel(!model.isActive, model.hour, model.minute);
                     AlarmModel currentModel = new AlarmModel(model.uniqueID, !model.isActive,
                             model.hour, model.minute, model.once, model.sunday, model.monday,
-                            model.tuesday, model.wendesnday, model.thursday, model.friday,
+                            model.tuesday, model.wednesday, model.thursday, model.friday,
                             model.saturday);
                     update(currentModel);
                     activity.onActiveToggle(currentModel, CellViewHolder.this.getAdapterPosition());
@@ -212,7 +199,10 @@ public class Alarms extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        alarmData = new AlarmData(getActivity());
+//        alarmData = new AlarmData(getActivity());
+        alarmData = new AlarmData(getActivity().getApplicationContext());
+        Activity appActivity = ((ApplicationActivity)getActivity()).getApplicationActivity();
+        alarmData.setApplicationActivity(appActivity);
 
         list = (RecyclerView) view;
         list.setHasFixedSize(true);
@@ -239,7 +229,7 @@ public class Alarms extends Fragment {
         }
     }
 
-    public void toggleAlarm(AlarmModel model, int position){
+    public void toggleAlarm(AlarmModel model, int position) {
         Activity activity = getActivity();
 
         JSONArray alarms = alarmData.toJSONArray();
@@ -253,24 +243,3 @@ public class Alarms extends Fragment {
         list.swapAdapter(new Adapter(activity, alarmData.toList()), false);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

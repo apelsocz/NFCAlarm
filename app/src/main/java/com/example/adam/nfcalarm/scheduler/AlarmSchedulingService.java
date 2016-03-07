@@ -11,6 +11,7 @@ import android.support.v4.app.TaskStackBuilder;
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.AlarmActivity;
 import com.example.adam.nfcalarm.R;
+import com.example.adam.nfcalarm.model.AlarmData;
 
 /**
  * This {@code IntentService} does the app's actual work. <p>

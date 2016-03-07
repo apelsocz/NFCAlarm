@@ -1,20 +1,17 @@
 package com.example.adam.nfcalarm.scheduler;
 
 import android.app.AlarmManager;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.provider.AlarmClock;
-import android.provider.Settings;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.widget.Toast;
 
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.R;
+import com.example.adam.nfcalarm.model.AlarmData;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -29,9 +26,8 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
     private AlarmManager alarmMgr;
     // pending intent that is triggered when the alarm fires.
     private PendingIntent alarmIntent;
+    private boolean millisSet;
 
-
-    @Override
     public void onReceive(Context context, Intent intent) {
         // simply create a new intent to deliver to the intent service.
         Intent service = new Intent(context, AlarmSchedulingService.class);
@@ -47,21 +43,26 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, WakefulAlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        AlarmData alarmData = new AlarmData(context);
 
         // // TODO: 16-01-17
         // set next repeating
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.setTimeZone(TimeZone.getDefault());
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTimeInMillis(System.currentTimeMillis());
+//        calendar.setTimeZone(TimeZone.getDefault());
 
 //        calendar.add(Calendar.SECOND, 10);
 
         //// TODO: 16-01-31 find next alarm and set
 //        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
 //                AlarmManager.INTERVAL_DAY, alarmIntent);
-        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
-//        Toast.makeText(context, "WakefulAlarmReceiver.setAlarm()", Toast.LENGTH_SHORT).show();
+//        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
+
+        //todo this is the line to keep
+        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarmData.getNextAlarmInMillis(), alarmIntent);
+//
+// Toast.makeText(context, "WakefulAlarmReceiver.setAlarm()", Toast.LENGTH_SHORT).show();
 
         // Enable {@code AlarmBootReceiver} to automatically restart the alarm when the
         // device is rebooted.
