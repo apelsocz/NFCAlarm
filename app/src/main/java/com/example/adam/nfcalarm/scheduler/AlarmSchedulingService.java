@@ -41,7 +41,6 @@ public class AlarmSchedulingService extends IntentService {
         // Release the wake lock provided by the BroadcastReceiver.
         // // TODO: 16-02-08 add boolean while notification active
         //// TODO: 16-02-14 call method from ResultActivity.class
-//        WakefulAlarmReceiver.completeWakefulIntent(intent);
 
 //        Intent activityIntent = new Intent(getBaseContext(), ApplicationActivity.class);
         Intent activityIntent = new Intent(getBaseContext(), AlarmActivity.class);
@@ -60,7 +59,7 @@ public class AlarmSchedulingService extends IntentService {
         activityIntent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
 
         getApplication().startActivity(activityIntent);*/
-
+//        WakefulAlarmReceiver.completeWakefulIntent(intent);
     }
     
     private void sendNotification(String msg) {

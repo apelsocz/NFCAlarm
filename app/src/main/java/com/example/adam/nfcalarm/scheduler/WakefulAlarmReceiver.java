@@ -44,25 +44,10 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         Intent intent = new Intent(context, WakefulAlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         AlarmData alarmData = new AlarmData(context);
+        long nextAlarmMillis = alarmData.setNextAlarm(AlarmData.ALARM_SET);
 
-        // // TODO: 16-01-17
-        // set next repeating
-
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTimeInMillis(System.currentTimeMillis());
-//        calendar.setTimeZone(TimeZone.getDefault());
-
-//        calendar.add(Calendar.SECOND, 10);
-
-        //// TODO: 16-01-31 find next alarm and set
-//        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-//                AlarmManager.INTERVAL_DAY, alarmIntent);
-//        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
-
-        //todo this is the line to keep
-        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarmData.getNextAlarmInMillis(), alarmIntent);
-//
-// Toast.makeText(context, "WakefulAlarmReceiver.setAlarm()", Toast.LENGTH_SHORT).show();
+//        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, nextAlarmMillis, alarmIntent);
+        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarmData.getNextAlarmInMillisTroubleshooting(), alarmIntent);
 
         // Enable {@code AlarmBootReceiver} to automatically restart the alarm when the
         // device is rebooted.
@@ -73,11 +58,11 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
     }
 
     public void cancelAlarm(Context context) {
-        // If the alarm has been set, cancel it.
         if(alarmMgr != null) {
             alarmMgr.cancel(alarmIntent);
         }
-//        Toast.makeText(context, "WakefulAlarmReceiver.cancelAlarm()", Toast.LENGTH_SHORT).show();
+        AlarmData alarmData = new AlarmData(context);
+        alarmData.setNextAlarm(AlarmData.ALARM_CANCEL);
 
         // Disable {@code AlarmBootReceiver} so that it doesn't automatically restart the
         // alarm when the device is rebooted.

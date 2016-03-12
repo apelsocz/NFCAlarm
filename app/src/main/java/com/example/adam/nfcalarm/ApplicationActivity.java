@@ -1,9 +1,12 @@
 package com.example.adam.nfcalarm;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TimePicker;
@@ -37,6 +40,14 @@ public class ApplicationActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
 
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(NAME, Context.MODE_PRIVATE);
+
+        Log.d("Launched!", "onCreate()");
+        Log.d("Launched!", String.valueOf(sharedPreferences.contains(ALARM_KEY)));
+        String string = sharedPreferences.getString(ALARM_KEY, "default value");
+        Log.d("Launched", string);
+        Log.d("Launched!", String.valueOf(sharedPreferences.contains(AlarmData.NEXT_KEY)));
+        Log.d("Launched", "Alarms.java");
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
 //                    .add(R.id.fragmentContainer, new Content(), Content.NAME)
@@ -44,6 +55,9 @@ public class ApplicationActivity extends AppCompatActivity {
                     .commit();
             Toast.makeText(getApplicationContext(), "savedInstance NULL", Toast.LENGTH_SHORT).show();
         }
+
+        Log.d("Launched!", String.valueOf(sharedPreferences.contains(ALARM_KEY)));
+        Log.d("Launched!", String.valueOf(sharedPreferences.contains(AlarmData.NEXT_KEY)));
     }
 
     @Override
@@ -116,12 +130,9 @@ public class ApplicationActivity extends AppCompatActivity {
     public void doAlarmSchedule(boolean scheduleAlarm) {
         if (scheduleAlarm) {
             alarmReceiver.setAlarm(this);
-            AlarmData alarmData = new AlarmData(getApplicationContext());
-//            alarmReceiver.setNextAlarmInMillis(alarmData.getNextAlarmInMillis());
         }
         else if (!scheduleAlarm) {
             alarmReceiver.cancelAlarm(this);
-//            alarmReceiver.setNextAlarmInMillis(AlarmData.NO_ALARMS);
         }
     }
 

@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,7 +83,6 @@ public class Alarms extends Fragment {
             ApplicationActivity activity = (ApplicationActivity) view.getContext();
             if (!Views.isActivityNull(activity)) {
                 //create shallow copy of the model and pass it around
-//                    activity.onAlarmClick(model);
                 if (isActive.equals(view)) {
 //                    ((Switch)view).setChecked(true);
 //                    activity.onActiveToggle();
@@ -230,6 +230,7 @@ public class Alarms extends Fragment {
     }
 
     public void toggleAlarm(AlarmModel model, int position) {
+        Log.d("Launched", "toggleAlarm()");
         Activity activity = getActivity();
 
         JSONArray alarms = alarmData.toJSONArray();
