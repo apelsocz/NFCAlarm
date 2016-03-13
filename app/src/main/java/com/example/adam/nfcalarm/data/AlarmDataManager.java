@@ -161,7 +161,11 @@ public class AlarmDataManager {
                             Log.d(String.valueOf(model.uniqueID), "DAY_OF_YEAR ++");
                             Log.d(String.valueOf(model.uniqueID), "dateModel.before(dateNext) = " +
                                     String.valueOf(dateModel.before(dateNext)));
+
                         } while (dateModel.before(dateNext));
+
+
+
                         Log.d(String.valueOf(model.uniqueID), "Exit: " +
                                 String.valueOf(calModel.get(Calendar.DAY_OF_WEEK)));
 
@@ -205,10 +209,10 @@ public class AlarmDataManager {
 
         if (alarmList.size() > 0){
             if (containsActiveAlarm(alarmList)) {
-                for (AlarmModel model : alarmList){
+                for (AlarmModel model : alarmList) {
                     if (model.isActive) {
                         String tag = String.valueOf(model.uniqueID) + ", [" + model.hour + ":" + model.minute + "]";
-                        Log.d(tag, "isActive");
+                        Log.d(tag, "<- isActive");
                         calModel.set(Calendar.HOUR_OF_DAY, Integer.parseInt(model.hour));
                         calModel.set(Calendar.MINUTE, Integer.parseInt(model.minute));
                         calModel.set(Calendar.SECOND, 0);
@@ -223,18 +227,51 @@ public class AlarmDataManager {
                             }
                         }
                         else {
+                            Log.d(tag, "model.repeats");
+                            // iterate, until first occurence of: dateModel being active after dateNow
+                            int i = 0;
+                            boolean iterate = true;
+                            do {
+                                Log.d(tag, "Iteration [" + String.valueOf(i) + "]");
+                                // refresh model calendar to today and increment by iteration value
+                                calModel.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR));
+                                calModel.add(Calendar.DAY_OF_YEAR, i);
+                                dateModel = calModel.getTime();
 
+                                if (isDayActive(calModel.get(Calendar.DAY_OF_WEEK), model)) {
+                                Log.d(tag, "> " + formatDayOfYear(calModel.get(Calendar.DAY_OF_WEEK)) +
+                                        " " + String.valueOf(calModel.get(Calendar.DAY_OF_YEAR))
+                                        + ", repeat: true");
+                                    // check if model is after now
+                                    if (dateModel.after(dateNow)) {
+                                        iterate = false;
+                                    }
+                                }
+                                else {
+                                    Log.d(tag, "> " + formatDayOfYear(calModel.get(Calendar.DAY_OF_WEEK)) +
+                                            " " + String.valueOf(calModel.get(Calendar.DAY_OF_YEAR))
+                                            + ", repeat: false");
+                                }
+                                String msg = iterate ? "keep going" : "STOP!";
+                                Log.d(tag, "> " + msg);
+
+                                i++;
+                            } while (iterate);
                         }
+                        // assign dateNext
                         Log.d(tag, dateModel.toString());
                         if (dateNext.getTime() == 0) {
-                            // assign dateNext, knowing that dateModel is more ideal
+                            // assign knowing that dateModel is more ideal
                             Log.d(tag, "dateNext.getTime() == 0");
                             dateNext = dateModel;
                         }
                         else {
+                            //assign, if dateModel is after dateNow && before current assignment
                             Log.d(tag, "dateNext.getTime() != 0");
-
+                            dateNext = dateModel.after(dateNow) && dateModel.before(dateNext) ?
+                                    dateModel : dateNext;
                         }
+                        nextMillis = dateNext.getTime();
                     }
                 }
             }
@@ -246,10 +283,12 @@ public class AlarmDataManager {
             nextMillis = 0;
         }
 
+        Log.d("[RETURN] nextmillis", String.valueOf(nextMillis));
         Log.d("[RETURN] dateNext", dateNext.toString());
         return nextMillis;
     }
 
+    //// TODO: 16-03-12 reference, when calling public doUpdate()
     public boolean containsActiveAlarm(List<AlarmModel> list) {
         boolean schedule = false;
         for (AlarmModel model : list) {
@@ -294,40 +333,57 @@ public class AlarmDataManager {
         Log.d(String.valueOf(model.uniqueID), " ");
     }
 
+    private String formatDayOfYear(int dayOfWeek) {
+        String day = "";
+
+        if (dayOfWeek == Calendar.SUNDAY) {
+            day = "sunday";
+        }
+        else if (dayOfWeek == Calendar.MONDAY) {
+            day = "monday";
+        }
+        else if (dayOfWeek == Calendar.TUESDAY) {
+            day = "tuesday";
+        }
+        else if (dayOfWeek == Calendar.WEDNESDAY) {
+            day = "wednesday";
+        }
+        else if (dayOfWeek == Calendar.THURSDAY) {
+            day = "thursday";
+        }
+        else if (dayOfWeek == Calendar.FRIDAY) {
+            day = "friday";
+        }
+        else if (dayOfWeek == Calendar.SATURDAY) {
+            day = "saturday";
+        }
+        return day;
+    }
+
     private boolean isDayActive(int dayOfWeek, AlarmModel model) {
         boolean active = false;
-        String dayOfWeekString = "oops! something went wrong";
+
         if (dayOfWeek == Calendar.SUNDAY) {
             active = model.sunday;
-            dayOfWeekString = "sunday";
         }
         else if (dayOfWeek == Calendar.MONDAY) {
             active = model.monday;
-            dayOfWeekString = "monday";
         }
         else if (dayOfWeek == Calendar.TUESDAY) {
             active = model.tuesday;
-            dayOfWeekString = "tuesday";
         }
         else if (dayOfWeek == Calendar.WEDNESDAY) {
             active = model.wednesday;
-            dayOfWeekString = "wednesday";
         }
         else if (dayOfWeek == Calendar.THURSDAY) {
             active = model.thursday;
-            dayOfWeekString = "thursday";
         }
         else if (dayOfWeek == Calendar.FRIDAY) {
             active = model.friday;
-            dayOfWeekString = "friday";
         }
         else if (dayOfWeek == Calendar.SATURDAY) {
             active = model.saturday;
-            dayOfWeekString = "saturday";
         }
-/*
-        Log.d(String.valueOf(model.uniqueID), "isDayActive: " + dayOfWeekString + ", " + String.valueOf(active));
-*/
         return active;
     }
 
@@ -340,7 +396,6 @@ public class AlarmDataManager {
                 .putLong(KEY_VALUE_NEXT, millis)
                 .commit();
     }
-
 
     /*
     public void remove(String key) {
