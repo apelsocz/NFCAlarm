@@ -1,3 +1,4 @@
+/*
 package com.example.adam.nfcalarm.model;
 
 import android.app.Activity;
@@ -71,7 +72,7 @@ public class AlarmData {
         }
 
         if (!Views.isActivityNull(appActivity)) {
-            ((ApplicationActivity)appActivity).doAlarmSchedule(scheduledAlarm);
+            ((ApplicationActivity)appActivity).doScheduling(scheduledAlarm);
         }
     }
 
@@ -282,4 +283,4 @@ public class AlarmData {
         }
         Log.d(String.valueOf(model.uniqueID), " ");
     }
-}
+}*/

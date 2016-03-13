@@ -19,7 +19,8 @@ import android.widget.Toast;
 
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.R;
-import com.example.adam.nfcalarm.model.AlarmData;
+import com.example.adam.nfcalarm.data.AlarmDataManager;
+//import com.example.adam.nfcalarm.model.AlarmData;
 import com.example.adam.nfcalarm.model.AlarmModel;
 import com.example.adam.nfcalarm.util.Views;
 
@@ -58,7 +59,8 @@ public class Edit extends Fragment implements View.OnClickListener {
     private CheckBox saturday;
 
     private long uniqueID;
-    private AlarmData alarmData;
+//    private AlarmData alarmData;
+    private AlarmDataManager alarmManager;
     private JSONArray alarms;
     private int savedModelIndex;
 
@@ -103,7 +105,8 @@ public class Edit extends Fragment implements View.OnClickListener {
         setHasOptionsMenu(true);
 
 //        alarmData = new AlarmData(activity);
-        alarmData = new AlarmData(activity.getApplicationContext());
+        /*alarmData = new AlarmData(activity.getApplicationContext());*/
+        alarmManager = AlarmDataManager.getInstance();
 
         // retrieve the model being edited, either in savedinstance or the fragments bundle
         String modelAsString = savedInstanceState != null && savedInstanceState.containsKey(MODEL_KEY) ?
@@ -111,7 +114,8 @@ public class Edit extends Fragment implements View.OnClickListener {
 
         currentModel = new AlarmModel(modelAsString);
         uniqueID = currentModel.uniqueID;
-        alarms = alarmData.toJSONArray();
+        /*alarms = alarmData.toJSONArray();*/
+        alarms = alarmManager.getJSONArray();
 
         savedModelIndex = -1;
         // // TODO: 16-01-19 Investigate, retrieving length may not be viable - JSONArray Null value expected
@@ -166,8 +170,8 @@ public class Edit extends Fragment implements View.OnClickListener {
                         else {
                             alarms.put(currentModel.json);
                         }
-
-                        alarmData.setAlarms(alarms);
+                        /*alarmData.setAlarms(alarms);*/
+                        ((ApplicationActivity)activity).doAlarmsUpdate(alarms);
                         isUpdated = true;
                     }
                     catch (JSONException e) {
@@ -175,13 +179,14 @@ public class Edit extends Fragment implements View.OnClickListener {
                     }
                 }
                 else {
-                    Toast.makeText(activity, "Validation required.", Toast.LENGTH_SHORT).show();
+                    // validation would be required here
                 }
                 break;
             case R.id.delete:
                 if (savedModelIndex > -1) {
                     alarms.remove(savedModelIndex);
-                    alarmData.setAlarms(alarms);
+                    /*alarmData.setAlarms(alarms);*/
+                    ((ApplicationActivity)activity).doAlarmsUpdate(alarms);
                 }
                 isUpdated = true;
                 break;

@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.R;
-import com.example.adam.nfcalarm.model.AlarmData;
+//import com.example.adam.nfcalarm.model.AlarmData;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -43,11 +43,17 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, WakefulAlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-        AlarmData alarmData = new AlarmData(context);
-        long nextAlarmMillis = alarmData.setNextAlarm(AlarmData.ALARM_SET);
+//        AlarmData alarmData = new AlarmData(context);
+//        long nextAlarmMillis = alarmData.setNextAlarm(AlarmData.ALARM_SET);
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.MINUTE, 10);
+
+
+        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
 //        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, nextAlarmMillis, alarmIntent);
-        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarmData.getNextAlarmInMillisTroubleshooting(), alarmIntent);
+//        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarmData.getNextAlarmInMillisTroubleshooting(), alarmIntent);
 
         // Enable {@code AlarmBootReceiver} to automatically restart the alarm when the
         // device is rebooted.
@@ -61,8 +67,8 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         if(alarmMgr != null) {
             alarmMgr.cancel(alarmIntent);
         }
-        AlarmData alarmData = new AlarmData(context);
-        alarmData.setNextAlarm(AlarmData.ALARM_CANCEL);
+//        AlarmData alarmData = new AlarmData(context);
+//        alarmData.setNextAlarm(AlarmData.ALARM_CANCEL);
 
         // Disable {@code AlarmBootReceiver} so that it doesn't automatically restart the
         // alarm when the device is rebooted.

@@ -12,7 +12,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,12 +21,10 @@ import android.widget.TextView;
 
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.R;
-import com.example.adam.nfcalarm.model.AlarmData;
+import com.example.adam.nfcalarm.data.AlarmDataManager;
+//import com.example.adam.nfcalarm.model.AlarmData;
 import com.example.adam.nfcalarm.model.AlarmModel;
 import com.example.adam.nfcalarm.util.Views;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.util.Collections;
 import java.util.List;
@@ -153,7 +150,8 @@ public class Alarms extends Fragment {
 
     private RecyclerView list;
     private FloatingActionButton fab;
-    private AlarmData alarmData;
+//    private AlarmData alarmData;
+    private AlarmDataManager alarmManager;
 
     @Override
     public void onStart() {
@@ -199,10 +197,14 @@ public class Alarms extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        alarmManager = AlarmDataManager.getInstance();
+
+        /*
 //        alarmData = new AlarmData(getActivity());
         alarmData = new AlarmData(getActivity().getApplicationContext());
         Activity appActivity = ((ApplicationActivity)getActivity()).getApplicationActivity();
         alarmData.setApplicationActivity(appActivity);
+        */
 
         list = (RecyclerView) view;
         list.setHasFixedSize(true);
@@ -218,20 +220,22 @@ public class Alarms extends Fragment {
         Activity activity = getActivity();
 
         if (!Views.isActivityNull(activity)) {
-            List<AlarmModel> models = alarmData.toList();
+//            List<AlarmModel> modelList = alarmData.toList();
+            List<AlarmModel> modelList = alarmManager.getAlarmsList();
 
-            if (models.size() == 0) {
+            if (modelList.size() == 0) {
                 //no data - add 'null' to fetch R.layout.alarms_empty_cell
-                models.add(AlarmModel.EMPTY);
+                modelList.add(AlarmModel.EMPTY);
             }
 
-            list.setAdapter(new Adapter(activity, models));
+            list.setAdapter(new Adapter(activity, modelList));
         }
     }
 
     public void toggleAlarm(AlarmModel model, int position) {
         Log.d("Launched", "toggleAlarm()");
-        Activity activity = getActivity();
+        /*
+//        Activity activity = getActivity();
 
         JSONArray alarms = alarmData.toJSONArray();
         try {
@@ -242,5 +246,14 @@ public class Alarms extends Fragment {
 
         alarmData.setAlarms(alarms);
         list.swapAdapter(new Adapter(activity, alarmData.toList()), false);
+        */
+        Activity activity = getActivity();
+        if (!Views.isActivityNull(activity)) {
+            alarmManager.doIndexUpdate(model, position);
+            list.swapAdapter(
+                    new Adapter(activity, alarmManager.getAlarmsList()),
+                    false
+            );
+        }
     }
 }
