@@ -28,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by adam on 15-12-30.
@@ -68,7 +69,8 @@ public class Edit extends Fragment implements View.OnClickListener {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.edit, container, false);
         isActive = (SwitchCompat) rootView.findViewById(R.id.edit_active);
         picker = (TimePicker) rootView.findViewById(R.id.edit_picker);
@@ -80,6 +82,7 @@ public class Edit extends Fragment implements View.OnClickListener {
         thursday = (CheckBox) rootView.findViewById(R.id.edit_repeat_thu);
         friday = (CheckBox) rootView.findViewById(R.id.edit_repeat_fri);
         saturday = (CheckBox) rootView.findViewById(R.id.edit_repeat_sat);
+        picker.setDescendantFocusability(TimePicker.FOCUS_BLOCK_DESCENDANTS);
         isActive.setOnClickListener(this);
         once.setOnClickListener(this);
         sunday.setOnClickListener(this);
@@ -97,15 +100,12 @@ public class Edit extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
 
         Activity activity = getActivity();
-
         if(Views.isActivityNull(activity)) {
             return;
         }
 
         setHasOptionsMenu(true);
 
-//        alarmData = new AlarmData(activity);
-        /*alarmData = new AlarmData(activity.getApplicationContext());*/
         alarmManager = AlarmDataManager.getInstance();
 
         // retrieve the model being edited, either in savedinstance or the fragments bundle
@@ -114,7 +114,6 @@ public class Edit extends Fragment implements View.OnClickListener {
 
         currentModel = new AlarmModel(modelAsString);
         uniqueID = currentModel.uniqueID;
-        /*alarms = alarmData.toJSONArray();*/
         alarms = alarmManager.getJSONArray();
 
         savedModelIndex = -1;
@@ -277,11 +276,9 @@ public class Edit extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        //// TODO: 16-03-06
-        // validation required, a radio box must always be selected. dont allow toggle if it
-        // would result in no radio boxes being selected
+
         if (view.equals(once)) {
-            if (once.isChecked() ) {
+            if (once.isChecked()) {
                 sunday.setChecked(false);
                 monday.setChecked(false);
                 tuesday.setChecked(false);
@@ -289,14 +286,22 @@ public class Edit extends Fragment implements View.OnClickListener {
                 thursday.setChecked(false);
                 friday.setChecked(false);
                 saturday.setChecked(false);
-                Toast.makeText(getActivity(), "ONCE" + once.isChecked(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "once.isChecked", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                once.setChecked(true);
             }
         }
-        //// TODO: 16-01-19 swap declaration of if statements, check if view clicked before once.isChecked
-        if (once.isChecked()){
-            if (view.equals(sunday) || view.equals(monday) || view.equals(tuesday) || view.equals(wednesday) ||
-                    view.equals(thursday) || view.equals(friday) || view.equals(saturday)){
+        else if (view.equals(sunday) || view.equals(monday) || view.equals(tuesday) ||
+                view.equals(wednesday) || view.equals(thursday) || view.equals(friday) ||
+                view.equals(saturday)) {
+            if (once.isChecked()) {
                 once.setChecked(false);
+            }
+            else if (!sunday.isChecked() && !monday.isChecked() && !tuesday.isChecked() &&
+                    !wednesday.isChecked() && !thursday.isChecked() && !friday.isChecked() &&
+                    !saturday.isChecked() ){
+                once.setChecked(true);
             }
         }
     }

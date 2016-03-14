@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
+
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.AlarmActivity;
 import com.example.adam.nfcalarm.R;
@@ -31,6 +33,7 @@ public class AlarmSchedulingService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Log.d("AlarmSchedulingService", "{Alarm Scheduling Service}");
 
         sendNotification(TAG);
 //        notify(TAG);

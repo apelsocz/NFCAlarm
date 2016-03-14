@@ -31,6 +31,7 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
     private PendingIntent alarmIntent;
 
     public void onReceive(Context context, Intent intent) {
+        Log.d("WakefulAlarmReceiver", "{onReceive}");
         // simply create a new intent to deliver to the intent service.
         Intent service = new Intent(context, AlarmSchedulingService.class);
         startWakefulService(context, service);
@@ -45,14 +46,19 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         Log.d("WakefulAlarmReceiver", "{setAlarm}");
 
         alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, WakefulBroadcastReceiver.class);
-        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-
-        alarmMgr.cancel(alarmIntent);
+        Intent intent = new Intent(context, WakefulAlarmReceiver.class);
+        alarmIntent = PendingIntent.getBroadcast(context, 1, intent, 0);
 
         AlarmDataManager alarmManager = AlarmDataManager.getInstance();
         long millis = alarmManager.getNextAlarmInMillis();
-        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, millis, alarmIntent);
+//        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, millis, alarmIntent);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.SECOND, 10);
+        Date date = calendar.getTime();
+        Log.d("WakefulAlarmReceiver", date.toString());
+        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, date.getTime(), alarmIntent);
 
         // Enable {@code AlarmBootReceiver} to automatically restart the alarm when the
         // device is rebooted.
@@ -71,8 +77,8 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         Log.d("WakefulAlarmReceiver", "{cancelAlarm}");
 
         alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, WakefulBroadcastReceiver.class);
-        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        Intent intent = new Intent(context, WakefulAlarmReceiver.class);
+        alarmIntent = PendingIntent.getBroadcast(context, 1, intent, 0);
 
         alarmMgr.cancel(alarmIntent);
 

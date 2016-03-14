@@ -137,10 +137,6 @@ public class AlarmDataManager {
         Date dateModel;
 
         Log.d("[START] now", dateNow.toString());
-        calNow.add(Calendar.DAY_OF_YEAR, -1);
-        dateNow = calNow.getTime();
-
-        Log.d("[START] now", dateNow.toString());
         Log.d("[START] next", String.valueOf(dateNext.getTime()));
         Log.d("[START] next", dateNext.toString());
 
