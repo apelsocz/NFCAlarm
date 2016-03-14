@@ -1,10 +1,13 @@
 package com.example.adam.nfcalarm.data;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.model.AlarmModel;
+import com.example.adam.nfcalarm.util.Views;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,9 +24,11 @@ public class AlarmDataManager {
     private static final String KEY_VALUE_NEXT = "com.example.adam.nfcalarm.data.KEY_VALUE_NEXT";
 
     private static AlarmDataManager sInstance;
+    private final Context mContext;
     private final SharedPreferences mPref;
 
     private AlarmDataManager(Context context) {
+        mContext = context;
         mPref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
@@ -90,6 +95,10 @@ public class AlarmDataManager {
         setAlarmKeyValue(json.toString());
     }
 
+    public long getNextAlarmInMillis() {
+        return getNextKeyValue();
+    }
+
     private String getAlarmKeyValue() {
         return mPref.getString(KEY_VALUE_ALARMS, "");
     }
@@ -99,111 +108,41 @@ public class AlarmDataManager {
         updated = mPref.edit()
                     .putString(KEY_VALUE_ALARMS, string)
                     .commit();
-//        setNextKeyValue(doNextKey());
-        setNextKeyValue(findNextKey());
+
+        //set to zero to force search - takes care of active alarm being deleted from list
+        setNextKeyValue(0L);
+        long nextKey = findNextKey();
+        setNextKeyValue(nextKey);
+
+        // setAlarmKeyValue should only be called within lifecycle
+        ApplicationActivity activity = (ApplicationActivity) mContext;
+        if (!Views.isActivityNull(activity)) {
+            activity.doScheduling(containsActiveAlarm());
+        }
+
         return updated;
     }
 
-    private long doNextKey() {
-        long nextMillis = getNextKeyValue();
-
-        Calendar calNext = Calendar.getInstance();
-        Calendar calNow = Calendar.getInstance();
-        Calendar calModel = Calendar.getInstance();
-        calNext.setTimeInMillis(System.currentTimeMillis());
-        calNow.setTimeInMillis(System.currentTimeMillis());
-        calModel.setTimeInMillis(System.currentTimeMillis());
-        Date dateNext;
-        Date dateNow = calNow.getTime();
-        Date dateModel;
-        List<AlarmModel> alarmList = getAlarmsList();
-
-//        //// TODO: 16-03-02 temporary setting date of Next Alarm for testing
-//        calNext.add(Calendar.DAY_OF_YEAR, 7);
-//        dateNext = calNext.getTime();
-
-//        if (nextMillis != 0 && alarmList.size() > 0 ) {
-        if (alarmList.size() > 0 ) {
-            calNext.setTimeInMillis(nextMillis);
-            dateNext = calNext.getTime();
-
-            for (AlarmModel model : alarmList) {
-                if (model.isActive) {
-                    Log.d(String.valueOf(model.uniqueID), "Alarm: " + model.hour + ":" + model.minute);
-                    calModel.set(Calendar.HOUR_OF_DAY, Integer.parseInt(model.hour));
-                    calModel.set(Calendar.MINUTE, Integer.parseInt(model.minute));
-                    calModel.set(Calendar.SECOND, 0);
-                    calModel.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR));
-                    dateModel = calModel.getTime();
-
-                    if (model.once) {
-                        Log.d(String.valueOf(model.uniqueID), "model.once");
-                        if (dateModel.before(dateNow)) {
-                            calModel.add(Calendar.DAY_OF_YEAR, 1);
-                            dateModel = calModel.getTime();
-                        }
-                    } else {
-                        logModel(model);
-                        do {
-                            Log.d(String.valueOf(model.uniqueID), "do-while");
-                            dateModel = calModel.getTime();
-
-                            if (isDayActive(calModel.get(Calendar.DAY_OF_WEEK), model)) {
-                                Log.d(String.valueOf(model.uniqueID), "Day Of Year: " +
-                                        String.valueOf(calModel.get(Calendar.DAY_OF_YEAR)));
-                                if (dateModel.after(dateNow)) {
-                                    dateModel = calModel.getTime();
-                                    Log.d(String.valueOf(model.uniqueID), " -- break; --");
-//                                    break;
-                                }
-                            }
-                            calModel.add(Calendar.DAY_OF_YEAR, 1);
-                            Log.d(String.valueOf(model.uniqueID), "DAY_OF_YEAR ++");
-                            Log.d(String.valueOf(model.uniqueID), "dateModel.before(dateNext) = " +
-                                    String.valueOf(dateModel.before(dateNext)));
-
-                        } while (dateModel.before(dateNext));
-
-
-
-                        Log.d(String.valueOf(model.uniqueID), "Exit: " +
-                                String.valueOf(calModel.get(Calendar.DAY_OF_WEEK)));
-
-                    }
-                    Log.d(String.valueOf(model.uniqueID), "dateNext: " +
-                            String.valueOf(dateModel.after(dateNow) && dateModel.before(dateNext)));
-                    Log.d("MODEL", dateModel.toString());
-                    dateNext = dateModel.after(dateNow) && dateModel.before(dateNext) ? dateModel : dateNext;
-                }
-            }
-            logNextAlarm(dateNext, dateNow);
-            Log.d("containsActiveAlarm()", String.valueOf(containsActiveAlarm(alarmList)));
-            nextMillis = containsActiveAlarm(alarmList) ? dateNext.getTime() : 0;
-        }
-        else {
-//            Log.d("getNextAlarmMillis()", String.valueOf(nextMillis != 0) + " && " +
-//                    String.valueOf(alarmList.size() > 0));
-            Log.d("getNextAlarmMillis()", String.valueOf(alarmList.size() > 0));
-            nextMillis = 0;
-        }
-
-        Log.d("NEXTMILLIS", String.valueOf(nextMillis));
-        return nextMillis;
-    }
-
     private long findNextKey() {
-        long nextMillis = getNextKeyValue();
-        Log.d("nextMillis", String.valueOf(nextMillis));
-
         Calendar calNext = Calendar.getInstance();
         Calendar calNow = Calendar.getInstance();
         Calendar calModel = Calendar.getInstance();
-        calNext.setTimeInMillis(nextMillis);
+
+        calNext.setTimeInMillis(getNextKeyValue());
         calNow.setTimeInMillis(System.currentTimeMillis());
         calModel.setTimeInMillis(System.currentTimeMillis());
+
         Date dateNext = calNext.getTime();
         Date dateNow = calNow.getTime();
-        Date dateModel = calModel.getTime();
+        Date dateModel;
+
+        Log.d("[START] now", dateNow.toString());
+        calNow.add(Calendar.DAY_OF_YEAR, -1);
+        dateNow = calNow.getTime();
+
+        Log.d("[START] now", dateNow.toString());
+        Log.d("[START] next", String.valueOf(dateNext.getTime()));
+        Log.d("[START] next", dateNext.toString());
 
         List<AlarmModel> alarmList = getAlarmsList();
 
@@ -213,11 +152,21 @@ public class AlarmDataManager {
                     if (model.isActive) {
                         String tag = String.valueOf(model.uniqueID) + ", [" + model.hour + ":" + model.minute + "]";
                         Log.d(tag, "<- isActive");
-                        calModel.set(Calendar.HOUR_OF_DAY, Integer.parseInt(model.hour));
-                        calModel.set(Calendar.MINUTE, Integer.parseInt(model.minute));
-                        calModel.set(Calendar.SECOND, 0);
                         calModel.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR));
+                        calModel.set(Calendar.HOUR_OF_DAY, 0);
+                        calModel.set(Calendar.MINUTE, 0);
+                        // set to 5 seconds to flex for midnight calculations and changes to leap seconds
+                        calModel.set(Calendar.SECOND, 5);
                         dateModel = calModel.getTime();
+                        Log.d(tag, "<- refreshed (" + dateModel.toString() + ")");
+                        int hourOfDay = Integer.parseInt(model.hour);
+                        int minute = Integer.parseInt(model.minute);
+                        Log.d(tag, String.valueOf(hourOfDay) + ":" + String.valueOf(minute));
+                        calModel.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calModel.set(Calendar.MINUTE, minute);
+
+                        dateModel = calModel.getTime();
+                        Log.d(tag, "<- add (" + dateModel.toString() + ")");
 
                         if (model.once) {
                             Log.d(tag, "model.once");
@@ -260,7 +209,7 @@ public class AlarmDataManager {
                         }
                         // assign dateNext
                         Log.d(tag, dateModel.toString());
-                        if (dateNext.getTime() == 0) {
+                        if (dateNext.getTime() == 0L) {
                             // assign knowing that dateModel is more ideal
                             Log.d(tag, "dateNext.getTime() == 0");
                             dateNext = dateModel;
@@ -270,26 +219,41 @@ public class AlarmDataManager {
                             Log.d(tag, "dateNext.getTime() != 0");
                             dateNext = dateModel.after(dateNow) && dateModel.before(dateNext) ?
                                     dateModel : dateNext;
+
                         }
-                        nextMillis = dateNext.getTime();
                     }
                 }
             }
             else {
-                nextMillis = 0;
+                Log.d("[RETURN]", "early, there are no active alarms");
+                return 0L;
             }
         }
         else {
-            nextMillis = 0;
+            Log.d("[RETURN]", "early, alarm list is empty");
+            return 0L;
         }
 
-        Log.d("[RETURN] nextmillis", String.valueOf(nextMillis));
+        Log.d("[RETURN] getTime", String.valueOf(dateNext.getTime()));
         Log.d("[RETURN] dateNext", dateNext.toString());
-        return nextMillis;
+        return dateNext.getTime();
     }
 
-    //// TODO: 16-03-12 reference, when calling public doUpdate()
-    public boolean containsActiveAlarm(List<AlarmModel> list) {
+    private long getNextKeyValue() {
+        return mPref.getLong(KEY_VALUE_NEXT, 0L);
+    }
+
+    private boolean setNextKeyValue(Long millis) {
+        return mPref.edit()
+                .putLong(KEY_VALUE_NEXT, millis)
+                .commit();
+    }
+
+    private boolean containsActiveAlarm() {
+        return containsActiveAlarm(getAlarmsList());
+    }
+
+    private boolean containsActiveAlarm(List<AlarmModel> list) {
         boolean schedule = false;
         for (AlarmModel model : list) {
             if (model.isActive) {
@@ -299,38 +263,6 @@ public class AlarmDataManager {
         }
         Log.d("containsActiveAlarm", String.valueOf(schedule));
         return schedule;
-    }
-
-    private void logNextAlarm(Date next, Date now) {
-        Log.d("NEXT", next.toString());
-        Log.d("NOW", now.toString());
-    }
-
-    private void logModel(AlarmModel model) {
-        Log.d(String.valueOf(model.uniqueID), "model repeats:");
-
-        if(model.sunday) {
-            Log.d(String.valueOf(model.uniqueID), "sunday");
-        }
-        if(model.monday) {
-            Log.d(String.valueOf(model.uniqueID), "monday");
-        }
-        if(model.tuesday) {
-            Log.d(String.valueOf(model.uniqueID), "tuesday");
-        }
-        if(model.wednesday) {
-            Log.d(String.valueOf(model.uniqueID), "wednesday");
-        }
-        if(model.thursday) {
-            Log.d(String.valueOf(model.uniqueID), "thursday");
-        }
-        if(model.friday) {
-            Log.d(String.valueOf(model.uniqueID), "friday");
-        }
-        if(model.saturday) {
-            Log.d(String.valueOf(model.uniqueID), "saturday");
-        }
-        Log.d(String.valueOf(model.uniqueID), " ");
     }
 
     private String formatDayOfYear(int dayOfWeek) {
@@ -387,27 +319,15 @@ public class AlarmDataManager {
         return active;
     }
 
-    private long getNextKeyValue() {
-        return mPref.getLong(KEY_VALUE_NEXT, 0);
-    }
-
-    private boolean setNextKeyValue(Long millis) {
-        return mPref.edit()
-                .putLong(KEY_VALUE_NEXT, millis)
-                .commit();
-    }
-
-    /*
-    public void remove(String key) {
+/*    private void remove(String key) {
         mPref.edit()
                 .remove(key)
                 .commit();
     }
 
-    public boolean clear() {
+    private boolean clear() {
         return mPref.edit()
                 .clear()
                 .commit();
-    }
-    */
+    }*/
 }

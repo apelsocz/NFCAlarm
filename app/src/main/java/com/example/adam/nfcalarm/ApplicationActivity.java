@@ -13,7 +13,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.adam.nfcalarm.data.AlarmDataManager;
-//import com.example.adam.nfcalarm.model.AlarmData;
 import com.example.adam.nfcalarm.model.AlarmModel;
 import com.example.adam.nfcalarm.scheduler.WakefulAlarmReceiver;
 import com.example.adam.nfcalarm.ui.Alarms;
@@ -25,32 +24,26 @@ import org.json.JSONArray;
 import java.util.List;
 
 public class ApplicationActivity extends AppCompatActivity {
-    public static final String NAME = ApplicationActivity.class.getSimpleName();
-    /**
-     * Key which keeps all alarms in shared preferences
-     */
-    public static final String ALARM_KEY = "alarmKey";
+    //// TODO: 16-03-13 App needs to be aware of shifts in time
+    // - change in longitude / latitude
+    // - manually update timezone
+    // - leap years
+    // - leap seconds
+    // - day light savings time
 
+    public static final String NAME = ApplicationActivity.class.getSimpleName();
     private WakefulAlarmReceiver alarmReceiver = new WakefulAlarmReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AlarmDataManager.initializeInstance(getApplicationContext());
+        AlarmDataManager.initializeInstance(this);
 
         setContentView(R.layout.activity_application);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
 
-//        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(NAME, Context.MODE_PRIVATE);
-//
-//        Log.d("Launched!", "onCreate()");
-//        Log.d("Launched!", String.valueOf(sharedPreferences.contains(ALARM_KEY)));
-//        String string = sharedPreferences.getString(ALARM_KEY, "default value");
-//        Log.d("Launched", string);
-//        Log.d("Launched!", String.valueOf(sharedPreferences.contains(AlarmData.NEXT_KEY)));
-//        Log.d("Launched", "Alarms.java");
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
 //                    .add(R.id.fragmentContainer, new Content(), Content.NAME)
@@ -58,9 +51,6 @@ public class ApplicationActivity extends AppCompatActivity {
                     .commit();
             Toast.makeText(getApplicationContext(), "savedInstance NULL", Toast.LENGTH_SHORT).show();
         }
-
-//        Log.d("Launched!", String.valueOf(sharedPreferences.contains(ALARM_KEY)));
-//        Log.d("Launched!", String.valueOf(sharedPreferences.contains(AlarmData.NEXT_KEY)));
     }
 
     @Override
@@ -133,9 +123,6 @@ public class ApplicationActivity extends AppCompatActivity {
     public void doAlarmsUpdate(JSONArray json) {
         AlarmDataManager alarmManager = AlarmDataManager.getInstance();
         alarmManager.doUpdate(json);
-        List<AlarmModel> alarmsList = alarmManager.getAlarmsList();
-        // TODO: 16-03-12 find a place to do this inside of alarmManager
-//        doScheduling(alarmManager.containsActiveAlarm(alarmsList));
     }
 
     public void doScheduling(boolean scheduleAlarm) {
@@ -145,9 +132,5 @@ public class ApplicationActivity extends AppCompatActivity {
         else if (!scheduleAlarm) {
             alarmReceiver.cancelAlarm(this);
         }
-    }
-
-    public AppCompatActivity getApplicationActivity() {
-        return this;
     }
 }
