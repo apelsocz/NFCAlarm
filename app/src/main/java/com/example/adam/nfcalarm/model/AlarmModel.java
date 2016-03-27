@@ -34,6 +34,7 @@ public class AlarmModel {
     public final boolean isEmpty;
     public final long uniqueID;
 
+
     public AlarmModel(String jsonAsString) {
         JSONObject j = new JSONObject();
         try {

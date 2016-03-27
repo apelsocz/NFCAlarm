@@ -1,7 +1,6 @@
 package com.example.adam.nfcalarm;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,19 +8,22 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.adam.nfcalarm.data.AlarmDataManager;
 import com.example.adam.nfcalarm.model.AlarmModel;
+import com.example.adam.nfcalarm.scheduler.AlarmService;
 import com.example.adam.nfcalarm.scheduler.WakefulAlarmReceiver;
 import com.example.adam.nfcalarm.ui.Alarms;
 import com.example.adam.nfcalarm.ui.Content;
 import com.example.adam.nfcalarm.ui.Edit;
+import com.example.adam.nfcalarm.ui.Display;
 
 import org.json.JSONArray;
-
-import java.util.List;
 
 public class ApplicationActivity extends AppCompatActivity {
     //// TODO: 16-03-13 App needs to be aware of shifts in time
@@ -31,6 +33,7 @@ public class ApplicationActivity extends AppCompatActivity {
     // - leap seconds
     // - day light savings time
 
+    // TODO: 16-03-26 if once, disable alarm when it went off
     public static final String NAME = ApplicationActivity.class.getSimpleName();
     private WakefulAlarmReceiver alarmReceiver = new WakefulAlarmReceiver();
 
@@ -39,17 +42,32 @@ public class ApplicationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         AlarmDataManager.initializeInstance(this);
 
-        setContentView(R.layout.activity_application);
+        boolean isRinging = false;
+        Bundle b = getIntent().getExtras();
+        if (b != null) {
+            isRinging = b.getBoolean(Display.NAME, false);
+        }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
-        setSupportActionBar(toolbar);
+        if (isRinging) {
+            setContentView(R.layout.activity_alarm);
+        }
+        else {
+            setContentView(R.layout.activity_application);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+            setSupportActionBar(toolbar);
+        }
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-//                    .add(R.id.fragmentContainer, new Content(), Content.NAME)
-                    .add(R.id.fragmentContainer, new Alarms(), Alarms.NAME)
-                    .commit();
-            Toast.makeText(getApplicationContext(), "savedInstance NULL", Toast.LENGTH_SHORT).show();
+            if (isRinging) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.alarmContainer, new Display(), Display.NAME)
+                        .commit();
+            }
+            else {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragmentContainer, new Alarms(), Alarms.NAME)
+                        .commit();
+            }
         }
     }
 
@@ -132,5 +150,12 @@ public class ApplicationActivity extends AppCompatActivity {
         else if (!scheduleAlarm) {
             alarmReceiver.cancelAlarm(this);
         }
+    }
+
+    public void stopRinging(){
+        Intent mpIntent = new Intent(this, AlarmService.class);
+        mpIntent.setAction(AlarmService.ACTION_PLAY);
+        stopService(mpIntent);
+        Log.d("ApplicationActivity", "stopRinging()");
     }
 }

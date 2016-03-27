@@ -35,6 +35,10 @@ import java.util.List;
 public class Alarms extends Fragment {
     public static final String NAME = Alarms.class.getSimpleName();
 
+    private RecyclerView list;
+    private FloatingActionButton mFAB;
+    private AlarmDataManager alarmManager;
+
     private static final class CellViewHolder extends ViewHolder implements View.OnClickListener {
 
         private final TextView time;
@@ -148,19 +152,14 @@ public class Alarms extends Fragment {
         }
     }
 
-    private RecyclerView list;
-    private FloatingActionButton fab;
-//    private AlarmData alarmData;
-    private AlarmDataManager alarmManager;
-
     @Override
     public void onStart() {
         super.onStart();
 
-        final Activity activity = getActivity();
+        Activity activity = getActivity();
         if (!Views.isActivityNull(activity)) {
-            fab = (FloatingActionButton) activity.findViewById(R.id.floating_action_btn);
-            fab.setOnClickListener(new View.OnClickListener() {
+            mFAB = (FloatingActionButton) activity.findViewById(R.id.floating_action_btn);
+            mFAB.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Snackbar.make(v, "Thank you!", Snackbar.LENGTH_SHORT)

@@ -11,12 +11,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.adam.nfcalarm.AlarmActivity">
+    tools:context="com.example.adam.nfcalarm.ApplicationActivity">
 
     <FrameLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:id="@+id/alarmContainer">
     </FrameLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floating_action_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:src="@drawable/alarm"
+        app:layout_anchor="@id/alarmContainer"
+        app:layout_anchorGravity="center_horizontal|center_vertical"
+        app:fabSize="normal"
+        app:elevation="@dimen/fab_elevation"
+        app:borderWidth="0dp" />
 
 </android.support.design.widget.CoordinatorLayout>

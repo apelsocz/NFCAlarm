@@ -13,7 +13,8 @@
     <FrameLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:id="@+id/fragmentContainer">
+        android:id="@+id/fragmentContainer"
+        android:background="@color/primaryColorLight">
     </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton

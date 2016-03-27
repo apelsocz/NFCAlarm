@@ -8,23 +8,18 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.adam.nfcalarm.ApplicationActivity;
-import com.example.adam.nfcalarm.R;
 import com.example.adam.nfcalarm.data.AlarmDataManager;
 //import com.example.adam.nfcalarm.model.AlarmData;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * When the alarm fires, this WakefulBroadcastReceiver receives the broadcast Intent
  * and then starts the IntentService {@code AlarmSchedulingService} to do some work.
  */
 public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
-
     // provides access to the system alarm services.
     private AlarmManager alarmMgr;
     // pending intent that is triggered when the alarm fires.
@@ -32,8 +27,13 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
 
     public void onReceive(Context context, Intent intent) {
         Log.d("WakefulAlarmReceiver", "{onReceive}");
+
+        Intent mpIntent = new Intent(context, AlarmService.class);
+        mpIntent.setAction(AlarmService.ACTION_PLAY);
+        context.startService(mpIntent);
+
         // simply create a new intent to deliver to the intent service.
-        Intent service = new Intent(context, AlarmSchedulingService.class);
+        Intent service = new Intent(context, SchedulingService.class);
         startWakefulService(context, service);
     }
 
@@ -43,22 +43,25 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
      * @param context the context of the app's Activity
      */
     public void setAlarm(Context context) {
+        // cancel any previously set alarms
+        cancelAlarm(context);
         Log.d("WakefulAlarmReceiver", "{setAlarm}");
 
         alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, WakefulAlarmReceiver.class);
-        alarmIntent = PendingIntent.getBroadcast(context, 1, intent, 0);
-
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         AlarmDataManager alarmManager = AlarmDataManager.getInstance();
-        long millis = alarmManager.getNextAlarmInMillis();
-//        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, millis, alarmIntent);
+        long millis = alarmManager.getNextMillisValue();
 
+        // for development purposes only
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.SECOND, 10);
+        calendar.add(Calendar.SECOND, 5);
         Date date = calendar.getTime();
         Log.d("WakefulAlarmReceiver", date.toString());
         alarmMgr.setExact(AlarmManager.RTC_WAKEUP, date.getTime(), alarmIntent);
+
+//        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, millis, alarmIntent);
 
         // Enable {@code AlarmBootReceiver} to automatically restart the alarm when the
         // device is rebooted.
@@ -78,7 +81,7 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
 
         alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, WakefulAlarmReceiver.class);
-        alarmIntent = PendingIntent.getBroadcast(context, 1, intent, 0);
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
         alarmMgr.cancel(alarmIntent);
 

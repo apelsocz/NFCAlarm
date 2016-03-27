@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 
-</LinearLayout>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/display_background"
+        android:scaleType="centerCrop"
+        android:src="@drawable/calm_water" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00000000"
+        android:alpha="0.6">
+        <TextView
+            android:id="@+id/display_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00 AM"
+            android:layout_marginTop="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textSize="54sp"
+            android:maxLines="1"
+            android:fontFamily="serif-monospace"
+            android:textColor="#FFF"
+            android:background="#AA000000" />
+        <TextView
+            android:id="@+id/display_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:layout_below="@id/display_time"
+            android:fontFamily="sans-serif-smallcaps"
+            android:textSize="20sp"
+            android:text="Wednesday, January 1st, 2016"
+            android:textColor="#FFF"
+            android:background="#AA000000" />
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -2,7 +2,7 @@
 <ScrollView
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:background="#ffffff"
+	android:background="@color/primaryColorLight"
 	android:paddingTop="?android:actionBarSize"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
@@ -22,7 +22,7 @@
 			android:layout_height="144dp"
 			android:id="@+id/edit_picker"
 			android:timePickerMode="spinner"
-			android:textDirection="locale"/>
+			android:textDirection="locale" />
 		<View
 			android:id="@+id/divider"
 			android:layout_width="match_parent"
@@ -30,7 +30,7 @@
 			android:minHeight="1dp"
 			android:layout_marginTop="8dp"
 			android:layout_marginBottom="8dp"
-			android:background="#12000000"
+			android:background="@color/divider"
 			android:layout_below="@id/edit_active" />
 
 		<TextView
@@ -43,7 +43,8 @@
 			android:gravity="center_vertical"
 			android:layout_width="match_parent"
 			android:layout_height="48dp"
-			android:id="@+id/edit_repeat"/>
+			android:id="@+id/edit_repeat"
+			android:textColor="@color/textColorSecondary"/>
 		<CheckBox
 			android:id="@+id/edit_repeat_once"
 			android:layout_width="match_parent"
@@ -52,7 +53,7 @@
 			android:layout_marginLeft="8dp"
 			android:layout_marginRight="16dp"
 			android:paddingStart="8dp"
-			android:textColor="#87000000"
+			android:textColor="@color/textColorPrimary"
 			android:textSize="16sp"
 			android:text="Once"
 			/>
@@ -64,7 +65,7 @@
 			android:layout_marginLeft="48dp"
 			android:paddingTop="8dp"
 			android:paddingBottom="8dp"
-			android:background="#12000000"
+			android:background="@color/divider"
 			android:layout_below="@id/edit_repeat_once" />
 		<CheckBox
 			android:id="@+id/edit_repeat_sun"
@@ -75,7 +76,7 @@
 			android:layout_marginRight="16dp"
 			android:paddingStart="8dp"
 			android:textSize="16sp"
-			android:textColor="#87000000"
+			android:textColor="@color/textColorPrimary"
 			android:text="Sunday"
 			/>
 		<CheckBox
@@ -87,7 +88,7 @@
 			android:layout_marginRight="16dp"
 			android:paddingStart="8dp"
 			android:textSize="16sp"
-			android:textColor="#87000000"
+			android:textColor="@color/textColorPrimary"
 			android:text="Monday"
 			/>
 		<CheckBox
@@ -99,7 +100,7 @@
 			android:layout_marginRight="16dp"
 			android:paddingStart="8dp"
 			android:textSize="16sp"
-			android:textColor="#87000000"
+			android:textColor="@color/textColorPrimary"
 			android:text="Tuesday"
 			/>
 		<CheckBox
@@ -111,7 +112,7 @@
 			android:layout_marginRight="16dp"
 			android:paddingStart="8dp"
 			android:textSize="16sp"
-			android:textColor="#87000000"
+			android:textColor="@color/textColorPrimary"
 			android:text="Wednesday"
 			/>
 		<CheckBox
@@ -123,7 +124,7 @@
 			android:layout_marginRight="16dp"
 			android:paddingStart="8dp"
 			android:textSize="16sp"
-			android:textColor="#87000000"
+			android:textColor="@color/textColorPrimary"
 			android:text="Thursday"
 			/>
 		<CheckBox
@@ -135,7 +136,7 @@
 			android:layout_marginRight="16dp"
 			android:paddingStart="8dp"
 			android:textSize="16sp"
-			android:textColor="#87000000"
+			android:textColor="@color/textColorPrimary"
 			android:text="Friday"
 			/>
 		<CheckBox
@@ -147,7 +148,7 @@
 			android:layout_marginRight="16dp"
 			android:paddingStart="8dp"
 			android:textSize="16sp"
-			android:textColor="#87000000"
+			android:textColor="@color/textColorPrimary"
 			android:text="Saturday"
 			/>
 

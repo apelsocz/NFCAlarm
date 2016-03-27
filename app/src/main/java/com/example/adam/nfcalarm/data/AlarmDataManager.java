@@ -95,7 +95,7 @@ public class AlarmDataManager {
         setAlarmKeyValue(json.toString());
     }
 
-    public long getNextAlarmInMillis() {
+    public long getNextMillisValue() {
         return getNextKeyValue();
     }
 

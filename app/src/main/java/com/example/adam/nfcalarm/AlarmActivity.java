@@ -1,43 +1,25 @@
 package com.example.adam.nfcalarm;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.WindowManager;
 
-import com.example.adam.nfcalarm.ui.PlaceholderFragment;
+import com.example.adam.nfcalarm.ui.Display;
 
-import net.danlew.android.joda.JodaTimeAndroid;
-
+/**
+ * Created by adam on 16-03-27.
+ */
 public class AlarmActivity extends AppCompatActivity {
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        JodaTimeAndroid.init(this);
 
         setContentView(R.layout.activity_alarm);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.alarmContainer, new PlaceholderFragment()).commit();
+                    .add(R.id.alarmContainer, new Display(), Display.NAME)
+                    .commit();
         }
-
-        Intent intent = getIntent();
-
-        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
     }
-
-/*    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle app bar item clicks here. The app bar
-        // automatically handles clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }*/
 }

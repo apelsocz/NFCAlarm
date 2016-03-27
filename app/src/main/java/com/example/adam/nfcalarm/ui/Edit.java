@@ -72,6 +72,7 @@ public class Edit extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.edit, container, false);
+
         isActive = (SwitchCompat) rootView.findViewById(R.id.edit_active);
         picker = (TimePicker) rootView.findViewById(R.id.edit_picker);
         once = (CheckBox) rootView.findViewById(R.id.edit_repeat_once);
@@ -82,6 +83,7 @@ public class Edit extends Fragment implements View.OnClickListener {
         thursday = (CheckBox) rootView.findViewById(R.id.edit_repeat_thu);
         friday = (CheckBox) rootView.findViewById(R.id.edit_repeat_fri);
         saturday = (CheckBox) rootView.findViewById(R.id.edit_repeat_sat);
+
         picker.setDescendantFocusability(TimePicker.FOCUS_BLOCK_DESCENDANTS);
         isActive.setOnClickListener(this);
         once.setOnClickListener(this);
@@ -92,6 +94,7 @@ public class Edit extends Fragment implements View.OnClickListener {
         thursday.setOnClickListener(this);
         friday.setOnClickListener(this);
         saturday.setOnClickListener(this);
+
         return rootView;
     }
 
