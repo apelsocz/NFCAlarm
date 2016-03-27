@@ -38,7 +38,7 @@ public class AlarmDataManager {
         }
     }
 
-    public static synchronized AlarmDataManager getInstance() {
+    public static synchronized AlarmDataManager getInstance() throws IllegalStateException {
         if (sInstance == null) {
             throw new IllegalStateException(AlarmDataManager.class.getSimpleName() +
                     " is not initialized, call initializeInstance(...) method first.");

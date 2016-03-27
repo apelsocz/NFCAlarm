@@ -17,6 +17,8 @@ import android.util.Log;
 import com.example.adam.nfcalarm.AlarmActivity;
 import com.example.adam.nfcalarm.R;
 import com.example.adam.nfcalarm.data.AlarmDataManager;
+import com.example.adam.nfcalarm.ui.Display;
+
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
@@ -24,7 +26,7 @@ import java.util.Date;
 public class AlarmService extends Service implements MediaPlayer.OnPreparedListener,
         MediaPlayer.OnCompletionListener, OnErrorListener {
 
-    private static final int ID_NOTIFICATION = 1;
+    public static final int ID_NOTIFICATION = 1;
     public static final String ACTION_PLAY = "com.example.adam.nfcalarm.PLAY";
 
     MediaPlayer mMediaPlayer = null;
@@ -36,15 +38,6 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
             initMediaPlayer();
         }
         return START_CONTINUATION_MASK;
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.d("AlarmService", "onDestroy()");
-        mMediaPlayer.stop();
-        mMediaPlayer.release();
-        mMediaPlayer = null;
-        super.onDestroy();
     }
 
     public void initMediaPlayer() {
@@ -69,7 +62,7 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
         // Prepare aysnc to not block main thread
         mMediaPlayer.prepareAsync();
 
-        showNotification();
+
     }
 
     @Nullable
@@ -80,8 +73,10 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
 
     /** Called when MediaPlayer is ready */
     public void onPrepared(MediaPlayer player) {
-        player.start();
         player.setLooping(true);
+        player.start();
+
+        showNotification();
     }
 
     @Override
@@ -100,12 +95,38 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
         mp.release();
     }
 
+    @Override
+    public void onDestroy() {
+        Log.d("AlarmService", "onDestroy()");
+        mMediaPlayer.stop();
+        mMediaPlayer.release();
+        mMediaPlayer = null;
+        stopForeground(true);
+        super.onDestroy();
+    }
+
     private void showNotification() {
-        Date d = new Date(AlarmDataManager.getInstance().getNextMillisValue()) ;
+
+        long millis;
+        try {
+            millis = AlarmDataManager.getInstance().getNextMillisValue();
+        } catch (IllegalStateException e) {
+            AlarmDataManager.initializeInstance(getApplicationContext());
+            millis = AlarmDataManager.getInstance().getNextMillisValue();
+        }
+        Date d = new Date(millis);
         DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT);
 
+        // TODO: 16-03-27 modify intent to only create a new activity if activity is not already running
         Intent activityIntent = new Intent(getApplicationContext(), AlarmActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0 , activityIntent, 0);
+
+        Intent doneIntent = new Intent(getApplicationContext(), AlarmActivity.class);
+        doneIntent.setAction(AlarmActivity.ACTION_DISMISS_ALARM);
+//        PendingIntent donePending = PendingIntent.getBroadcast(getApplicationContext(), 0, doneIntent, 0);
+        PendingIntent donePending = PendingIntent.getActivity(getApplicationContext(), 0, doneIntent, PendingIntent.FLAG_ONE_SHOT);
+
+        NotificationCompat.Action dismiss = new NotificationCompat.Action(R.drawable.icon_nfc, "Done", donePending);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.icon_nfc)
@@ -116,9 +137,12 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
                 .setAutoCancel(false)
                 .setOngoing(true)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setPriority(NotificationCompat.PRIORITY_MAX);
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .addAction(dismiss);
 
-        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(ID_NOTIFICATION, builder.build());
+//        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        nm.notify(ID_NOTIFICATION, builder.build());
+        startForeground(ID_NOTIFICATION, builder.build());
     }
 }
