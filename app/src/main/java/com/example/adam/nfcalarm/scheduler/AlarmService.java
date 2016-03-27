@@ -1,6 +1,5 @@
 package com.example.adam.nfcalarm.scheduler;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -10,31 +9,28 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-
-import com.example.adam.nfcalarm.ApplicationActivity;
+import com.example.adam.nfcalarm.AlarmActivity;
 import com.example.adam.nfcalarm.R;
 import com.example.adam.nfcalarm.data.AlarmDataManager;
-import com.example.adam.nfcalarm.ui.Display;
-
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class AlarmService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener,
-        OnErrorListener {
+public class AlarmService extends Service implements MediaPlayer.OnPreparedListener,
+        MediaPlayer.OnCompletionListener, OnErrorListener {
+
     private static final int ID_NOTIFICATION = 1;
     public static final String ACTION_PLAY = "com.example.adam.nfcalarm.PLAY";
 
     MediaPlayer mMediaPlayer = null;
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("AlarmService", "onStartCommand");
+        Log.d("AlarmService", "onStartCommand()");
         if (intent.getAction().equals(ACTION_PLAY)) {
             Log.d("AlarmService", "Action = PLAY");
             initMediaPlayer();
@@ -44,7 +40,7 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public void onDestroy() {
-        Log.d("AlarmService", "StopService");
+        Log.d("AlarmService", "onDestroy()");
         mMediaPlayer.stop();
         mMediaPlayer.release();
         mMediaPlayer = null;
@@ -60,6 +56,7 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
         mMediaPlayer.setOnErrorListener(this);
 
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+
         if (uri == null) {
             uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         }
@@ -98,20 +95,17 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        Log.d("AlarmService", "onDestroy()");
         mp.stop();
         mp.release();
     }
 
     private void showNotification() {
-        Bundle b = new Bundle();
-        b.putBoolean(Display.NAME, true);
-        Intent activityIntent = new Intent(getApplicationContext(), ApplicationActivity.class);
-        activityIntent.putExtras(b);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0 , activityIntent, 0);
-
         Date d = new Date(AlarmDataManager.getInstance().getNextMillisValue()) ;
         DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT);
+
+        Intent activityIntent = new Intent(getApplicationContext(), AlarmActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0 , activityIntent, 0);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.icon_nfc)
@@ -120,7 +114,9 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
                 .setContentIntent(contentIntent)
                 .setShowWhen(false)
                 .setAutoCancel(false)
-                .setOngoing(true);
+                .setOngoing(true)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setPriority(NotificationCompat.PRIORITY_MAX);
 
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(ID_NOTIFICATION, builder.build());

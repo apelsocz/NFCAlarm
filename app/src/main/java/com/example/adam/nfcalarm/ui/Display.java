@@ -6,19 +6,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.adam.nfcalarm.AlarmActivity;
 import com.example.adam.nfcalarm.ApplicationActivity;
 import com.example.adam.nfcalarm.R;
 
@@ -35,6 +39,7 @@ public class Display extends Fragment {
 
     private TextView mTime;
     private TextView mDate;
+    private ImageView mBackground;
     private FloatingActionButton mFAB;
 
     private BroadcastReceiver mTimeTickReceiver = new BroadcastReceiver() {
@@ -63,77 +68,25 @@ public class Display extends Fragment {
 
         mTime = (TextView) rootView.findViewById(R.id.display_time);
         mDate = (TextView) rootView.findViewById(R.id.display_date);
+        mBackground = (ImageView) rootView.findViewById(R.id.display_background);
 
         return rootView;
-    }
-
-    private void update() {
-        final DateFormat df = DateFormat.getDateInstance(DateFormat.FULL);
-        final DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT);
-
-        mDate.setText(df.format(Calendar.getInstance().getTime()));
-        mTime.setText(tf.format(Calendar.getInstance().getTime()));
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.d("display", "onActivityCreated()");
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        Log.d("display", "onViewStateRestored()");
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d("display", "onSaveInstanceState()");
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        Log.d("display", "onConfigChang()");
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        Log.d("display", "onLowMemory()");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d("display", "onDestroyView()");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d("display", "onDestroy()");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d("display", "onDetach()");
     }
 
     @Override
     public void onStart() {
         super.onStart();
-
         final Activity activity = getActivity();
+
+//        Drawable drawable = ContextCompat.getDrawable(activity, R.drawable.calm_water);
+//        mBackground.setImageDrawable(drawable);
+
         mFAB = (FloatingActionButton) activity.findViewById(R.id.floating_action_btn);
         mFAB.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 if (v.equals(mFAB)){
-                    ((ApplicationActivity)activity).stopRinging();
+                    ((AlarmActivity)activity).stopRinging();
                 }
                 return false;
             }
@@ -155,9 +108,11 @@ public class Display extends Fragment {
         super.onPause();
     }
 
-    @Override
-    public void onStop() {
-        Log.d("display", "onStop()");
-        super.onStop();
+    private void update() {
+        final DateFormat df = DateFormat.getDateInstance(DateFormat.FULL);
+        final DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT);
+
+        mDate.setText(df.format(Calendar.getInstance().getTime()));
+        mTime.setText(tf.format(Calendar.getInstance().getTime()));
     }
 }

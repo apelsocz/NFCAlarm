@@ -42,32 +42,14 @@ public class ApplicationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         AlarmDataManager.initializeInstance(this);
 
-        boolean isRinging = false;
-        Bundle b = getIntent().getExtras();
-        if (b != null) {
-            isRinging = b.getBoolean(Display.NAME, false);
-        }
-
-        if (isRinging) {
-            setContentView(R.layout.activity_alarm);
-        }
-        else {
-            setContentView(R.layout.activity_application);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
-            setSupportActionBar(toolbar);
-        }
+        setContentView(R.layout.activity_application);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
 
         if (savedInstanceState == null) {
-            if (isRinging) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.alarmContainer, new Display(), Display.NAME)
-                        .commit();
-            }
-            else {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.fragmentContainer, new Alarms(), Alarms.NAME)
-                        .commit();
-            }
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragmentContainer, new Alarms(), Alarms.NAME)
+                    .commit();
         }
     }
 
@@ -150,12 +132,5 @@ public class ApplicationActivity extends AppCompatActivity {
         else if (!scheduleAlarm) {
             alarmReceiver.cancelAlarm(this);
         }
-    }
-
-    public void stopRinging(){
-        Intent mpIntent = new Intent(this, AlarmService.class);
-        mpIntent.setAction(AlarmService.ACTION_PLAY);
-        stopService(mpIntent);
-        Log.d("ApplicationActivity", "stopRinging()");
     }
 }

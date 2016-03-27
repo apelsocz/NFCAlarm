@@ -31,6 +31,12 @@
         </receiver>
 
         <service android:name=".scheduler.SchedulingService"/>
+
+        <activity
+            android:name=".AlarmActivity"
+            android:excludeFromRecents="true">
+        </activity>
+
         <service android:name=".scheduler.AlarmService"/>
 
     </application>
