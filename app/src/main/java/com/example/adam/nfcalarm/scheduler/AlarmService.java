@@ -61,8 +61,6 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
 
         // Prepare aysnc to not block main thread
         mMediaPlayer.prepareAsync();
-
-
     }
 
     @Nullable
@@ -90,7 +88,7 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        Log.d("AlarmService", "onDestroy()");
+        Log.d("AlarmService", "onCompletion()");
         mp.stop();
         mp.release();
     }

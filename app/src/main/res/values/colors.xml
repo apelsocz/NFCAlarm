@@ -1,29 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--<color name="primaryColor">#3F51B5</color>-->
-    <color name="primaryColor">#607D8B</color>
-    <color name="primaryColorDark">#455A64</color>
-    <color name="primaryColorLight">#CFD8DC</color>
-    <!--<color name="accentColor">#FF5722</color>-->
+    <color name="primaryColor">#212121</color>
+    <color name="primaryColorDark">#000000</color>
+    <color name="primaryColorLight">#303030</color>
+    <color name="colorWindowBackground">#303030</color>
+    <color name="colorCardDialogBackground">#424242</color>
     <color name="accentColor">#00B8D4</color>
-    <color name="textColorPrimary">#212121</color>
-    <color name="textColorSecondary">#727272</color>
-    <color name="divider">#b6b6b6</color>
-
-    <!--<color name="primaryColor">#EEE</color>
-    <color name="primaryColorDark">#9E9E9E</color>
-    <color name="accentColor">#009688</color>
-    <color name="textColorPrimary">#000</color>
-    <color name="textColorSecondary">#E0E0E0</color>-->
-
-<!--
-    <color name="primary">#4CAF50</color>
-    <color name="primary_dark">#388E3C</color>
-    <color name="primary_light">#C8E6C9</color>
-    <color name="accent">#FFC107</color>
-    <color name="primary_text">#212121</color>
-    <color name="secondary_text">#727272</color>
-    <color name="icons">#FFFFFF</color>
-    <color name="divider">#B6B6B6</color>
--->
+    <color name="textColorPrimary">#FFFFFF</color>
+    <color name="textColorSecondary">#62FFFFFF</color>
+    <color name="colorFocusedHighlight">#00B8D4</color>
+    <color name="divider">#12FFFFFF</color>
 </resources>

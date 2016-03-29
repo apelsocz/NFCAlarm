@@ -8,13 +8,13 @@
 
     <include
         android:id="@+id/app_bar"
-        layout="@layout/app_bar"/>
+        layout="@layout/app_bar" />
 
     <FrameLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:id="@+id/fragmentContainer"
-        android:background="@color/primaryColorLight">
+        android:id="@+id/fragmentContainer">
+        <!--android:background="@color/primaryColorLight"-->
     </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:clickable="true"
-        android:src="@drawable/alarm"
+        android:src="@drawable/ic_alarm_add_white_48dp"
         app:layout_anchor="@id/fragmentContainer"
         app:layout_anchorGravity="bottom|right"
         app:fabSize="normal"

@@ -22,29 +22,28 @@
 			android:layout_height="144dp"
 			android:id="@+id/edit_picker"
 			android:timePickerMode="spinner"
-			android:textDirection="locale" />
+			android:textDirection="locale"
+			android:layout_marginStart="32dp"/>
 		<View
 			android:id="@+id/divider"
 			android:layout_width="match_parent"
 			android:layout_height="1dp"
 			android:minHeight="1dp"
-			android:layout_marginTop="8dp"
-			android:layout_marginBottom="8dp"
 			android:background="@color/divider"
 			android:layout_below="@id/edit_active" />
-
 		<TextView
-			android:hint="@string/edit_repeat"
-			android:layout_marginLeft="16dp"
-			android:layout_marginRight="16dp"
-			android:textSize="14sp"
-			android:fontFamily="sans-serif-medium"
-			android:layout_below="@id/divider"
-			android:gravity="center_vertical"
 			android:layout_width="match_parent"
 			android:layout_height="48dp"
 			android:id="@+id/edit_repeat"
-			android:textColor="@color/textColorSecondary"/>
+			android:background="@color/primaryColorLight"
+			android:paddingStart="16dp"
+			android:paddingEnd="16dp"
+			android:layout_below="@id/divider"
+			android:gravity="center_vertical"
+			android:textSize="14sp"
+			android:textColor="@color/textColorSecondary"
+			android:fontFamily="sans-serif-medium"
+			android:text="@string/edit_repeat"/>
 		<CheckBox
 			android:id="@+id/edit_repeat_once"
 			android:layout_width="match_parent"
@@ -57,21 +56,12 @@
 			android:textSize="16sp"
 			android:text="Once"
 			/>
-		<View
-			android:id="@+id/divider_repeat"
-			android:layout_width="match_parent"
-			android:layout_height="1dp"
-			android:minHeight="1dp"
-			android:layout_marginLeft="48dp"
-			android:paddingTop="8dp"
-			android:paddingBottom="8dp"
-			android:background="@color/divider"
-			android:layout_below="@id/edit_repeat_once" />
+
 		<CheckBox
 			android:id="@+id/edit_repeat_sun"
 			android:layout_width="match_parent"
 			android:layout_height="48dp"
-			android:layout_below="@id/divider_repeat"
+			android:layout_below="@id/edit_repeat_once"
 			android:layout_marginLeft="8dp"
 			android:layout_marginRight="16dp"
 			android:paddingStart="8dp"

@@ -12,7 +12,7 @@
     <string name="dialog_negative">Cancel</string>
     <string name="alarms_no_data">No Alarms</string>
     <string name="edit_time">Time</string>
-    <string name="edit_repeat">Repeats</string>
+    <string name="edit_repeat">Frequency</string>
 
     <string-array name="repeat_options">
         <item>Only once</item>
