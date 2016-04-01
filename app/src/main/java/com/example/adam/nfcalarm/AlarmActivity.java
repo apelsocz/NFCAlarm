@@ -18,16 +18,6 @@ public class AlarmActivity extends AppCompatActivity {
     public static final String ACTION_DISMISS_ALARM = "com.example.adam.nfcalarm.ACTION_DISMISS_ALARM";
     public static final String ACTION_SNOOZE_ALARM = "com.example.adam.nfcalarm.ACTION_SNOOZE_ALARM";
 
-    private BroadcastReceiver mAlarmActionReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("AlarmActivity", "mAlarmActionReceiver:onReceive()");
-            if (intent.getAction().equals(ACTION_DISMISS_ALARM)) {
-                stopRinging();
-            }
-        }
-    };
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,15 +43,12 @@ public class AlarmActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-//        registerReceiver(mAlarmActionReceiver, new IntentFilter(ACTION_DISMISS_ALARM));
     }
 
     public void stopRinging() {
         Intent mpIntent = new Intent(this, AlarmService.class);
-        mpIntent.setAction(AlarmService.ACTION_PLAY);
+//        mpIntent.setAction(AlarmService.ACTION_PLAY);
         stopService(mpIntent);
-        Log.d("ApplicationActivity", "stopRinging()");
+        Log.d("AlarmActivity", "stopRinging()");
     }
-
-
 }

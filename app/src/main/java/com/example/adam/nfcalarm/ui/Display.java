@@ -52,7 +52,6 @@ public class Display extends Fragment {
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 //        Window window = getActivity().getWindow();
 //        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
 //                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
@@ -63,7 +62,8 @@ public class Display extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.alarm_display, container, false);
 
         mTime = (TextView) rootView.findViewById(R.id.display_time);

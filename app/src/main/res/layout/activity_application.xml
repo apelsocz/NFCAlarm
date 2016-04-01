@@ -16,6 +16,10 @@
         android:id="@+id/fragmentContainer">
         <!--android:background="@color/primaryColorLight"-->
     </FrameLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="@dimen/abc_action_bar_default_height_material" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floating_action_btn"

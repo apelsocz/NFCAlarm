@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
@@ -38,9 +39,9 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
     }
 
     /**
-     * Sets the next alarm to run. When the alarm fires, the app broadcasts an Intent to this
-     * WakefulBroadcastReceiver.
-     * @param context the context of the app's Activity
+     * Sets the next alarm to run. When the alarm fires,
+     * the app broadcasts an Intent to this WakefulBroadcastReceiver.
+     * @param context the context of the app's Activity.
      */
     public void setAlarm(Context context) {
         // cancel any previously set alarms

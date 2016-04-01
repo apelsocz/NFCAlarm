@@ -115,6 +115,7 @@ public class AlarmDataManager {
         setNextKeyValue(nextKey);
 
         // setAlarmKeyValue should only be called within lifecycle
+        // TODO: 16-03-31 Context reference is broken - after dismissing an alarm closing the app and relaunching.
         ApplicationActivity activity = (ApplicationActivity) mContext;
         if (!Views.isActivityNull(activity)) {
             activity.doScheduling(containsActiveAlarm());

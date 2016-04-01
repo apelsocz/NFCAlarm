@@ -36,7 +36,7 @@
             android:name=".AlarmActivity">
         </activity>
 
-        <service android:name=".scheduler.AlarmService"/>
+        <service android:name=".scheduler.AlarmService" />
 
     </application>
 
