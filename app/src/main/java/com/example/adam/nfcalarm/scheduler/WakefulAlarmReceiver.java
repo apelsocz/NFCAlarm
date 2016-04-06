@@ -6,7 +6,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
@@ -51,8 +50,8 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, WakefulAlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-        AlarmDataManager alarmManager = AlarmDataManager.getInstance();
-        long millis = alarmManager.getNextMillisValue();
+
+        long millis = AlarmDataManager.getInstance().getNextAlarmMillis();
 
         // for development purposes only
         Calendar calendar = Calendar.getInstance();
@@ -60,9 +59,9 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         calendar.add(Calendar.SECOND, 5);
         Date date = calendar.getTime();
         Log.d("WakefulAlarmReceiver", date.toString());
-        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, date.getTime(), alarmIntent);
+//        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, date.getTime(), alarmIntent);
 
-//        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, millis, alarmIntent);
+//        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, millis, getPending(context));
 
         // Enable {@code AlarmBootReceiver} to automatically restart the alarm when the
         // device is rebooted.
@@ -92,5 +91,24 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         PackageManager pm = context.getPackageManager();
         pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
+    }
+
+    public void snooze(Context context) {
+
+        alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, WakefulAlarmReceiver.class);
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.SECOND, 10);
+        Date date = calendar.getTime();
+        Log.d("WakefulAlarmReceiver", "snooze()");
+        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, date.getTime(), alarmIntent);
+    }
+
+    public void dismiss(Context context) {
+        //model.once -> disable
+        //setAlarm()
     }
 }

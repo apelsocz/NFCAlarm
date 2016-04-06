@@ -5,35 +5,23 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.adam.nfcalarm.AlarmActivity;
-import com.example.adam.nfcalarm.ApplicationActivity;
+import com.example.adam.nfcalarm.RingingActivity;
 import com.example.adam.nfcalarm.R;
 
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
-
-/**
- * Created by adam on 16-02-16.
- */
 public class Display extends Fragment {
     public static final String NAME = Display.class.getName();
 
@@ -78,15 +66,12 @@ public class Display extends Fragment {
         super.onStart();
         final Activity activity = getActivity();
 
-//        Drawable drawable = ContextCompat.getDrawable(activity, R.drawable.calm_water);
-//        mBackground.setImageDrawable(drawable);
-
         mFAB = (FloatingActionButton) activity.findViewById(R.id.floating_action_btn);
         mFAB.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 if (v.equals(mFAB)){
-                    ((AlarmActivity)activity).stopRinging();
+                    ((RingingActivity)activity).dismiss();
                 }
                 return false;
             }
@@ -114,5 +99,13 @@ public class Display extends Fragment {
 
         mDate.setText(df.format(Calendar.getInstance().getTime()));
         mTime.setText(tf.format(Calendar.getInstance().getTime()));
+    }
+
+    public void snooze() {
+        // TODO: 16-04-02 set text label
+    }
+
+    public void dismiss() {
+        // TODO: 16-04-02 set text label
     }
 }

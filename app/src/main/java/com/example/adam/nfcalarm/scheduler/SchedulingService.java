@@ -2,11 +2,10 @@ package com.example.adam.nfcalarm.scheduler;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
 
-import com.example.adam.nfcalarm.AlarmActivity;
-import com.example.adam.nfcalarm.ui.Display;
+import com.example.adam.nfcalarm.MyApplication;
+import com.example.adam.nfcalarm.RingingActivity;
 
 /**
  * This {@code IntentService} does the app's actual work. <p>
@@ -24,9 +23,8 @@ public class SchedulingService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Log.d("AlarmSchedulingService", "{Alarm Scheduling Service}");
 
-        Intent activityIntent = new Intent(getApplicationContext(), AlarmActivity.class);
+        Intent activityIntent = new Intent(getApplicationContext(), RingingActivity.class);
         activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
         getApplication().startActivity(activityIntent);
 
         // Release the wake lock provided by the BroadcastReceiver.

@@ -1,13 +1,12 @@
 package com.example.adam.nfcalarm.data;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.example.adam.nfcalarm.ApplicationActivity;
+import com.example.adam.nfcalarm.MyApplication;
 import com.example.adam.nfcalarm.model.AlarmModel;
-import com.example.adam.nfcalarm.util.Views;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,25 +18,37 @@ import java.util.List;
 
 public class AlarmDataManager {
 
+    //done
     private static final String PREF_NAME = AlarmDataManager.class.getSimpleName();
+    //done
     private static final String KEY_VALUE_ALARMS = "com.example.adam.nfcalarm.data.KEY_VALUE_ALARMS";
-    private static final String KEY_VALUE_NEXT = "com.example.adam.nfcalarm.data.KEY_VALUE_NEXT";
+    //done
+    private static final String KEY_VALUE_MILLIS = "com.example.adam.nfcalarm.data.KEY_VALUE_MILLIS";
+    //done
+    private static final String KEY_VALUE_ID = "com.example.adam.nfcalarm.data.KEY_VALUE_ID";
 
+    //done
     private static AlarmDataManager sInstance;
+    //done
     private final Context mContext;
+    //done
     private final SharedPreferences mPref;
 
+    //done
     private AlarmDataManager(Context context) {
         mContext = context;
         mPref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
+    //done
     public static synchronized void initializeInstance(Context context) {
         if (sInstance == null) {
-            sInstance = new AlarmDataManager(context);
+            // ApplicationContext is a singleton instance running in the application PID.
+            sInstance = new AlarmDataManager(context.getApplicationContext());
         }
     }
 
+    //done
     public static synchronized AlarmDataManager getInstance() throws IllegalStateException {
         if (sInstance == null) {
             throw new IllegalStateException(AlarmDataManager.class.getSimpleName() +
@@ -46,21 +57,77 @@ public class AlarmDataManager {
         return sInstance;
     }
 
-    public JSONArray getJSONArray() {
-        String modelsAsString = getAlarmKeyValue();
-        JSONArray modelsAsJSON;
-
-        try {
-            modelsAsJSON = new JSONArray(modelsAsString);
+    // TODO: 16-04-03
+    public void doAlarmDismissed(long id) {
+        List<AlarmModel> list = getAlarmsList();
+        for (AlarmModel model : list) {
+            if (model.uniqueID == id) {
+                if (model.once && model.isActive) {
+                    int index = list.indexOf(model);
+                    AlarmModel updateModel = new AlarmModel(model.uniqueID, !model.isActive, model.hour,
+                            model.minute, model.once, model.sunday, model.monday, model.tuesday,
+                            model.wednesday, model.thursday, model.friday, model.saturday);
+                    updateModelAtIndex(updateModel, index);
+                }
+            }
         }
-        catch (JSONException e) {
-            e.printStackTrace();
-            Log.d(PREF_NAME + " getJSONArray()", "modelsAsString is empty");
-            modelsAsJSON = new JSONArray();
-        }
-        return modelsAsJSON;
+        update();
     }
 
+    // TODO: 16-04-03  AlarmDAO
+    public AlarmModel getAlarmModelByID(long id) {
+        AlarmModel model;
+        List<AlarmModel> modelList = getAlarmsList();
+        for (AlarmModel alarmModel : modelList) {
+            if (alarmModel.uniqueID == id) {
+                return alarmModel;
+            }
+        }
+        //// TODO: 16-04-05 return AlarmModel.EMPTY | null ...(model.isEmpty)
+        return null;
+    }
+
+    // TODO: 16-04-03  AlarmDAO
+    public boolean updateModelAtIndex(AlarmModel model, int index) {
+        boolean updated = false;
+        JSONArray before = getJSONArray();
+
+        if (before.length() > 0) {
+            JSONArray after;
+            try {
+                after = before.put(index, model.json);
+                updated = setPreferencesAlarmsData(after.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return updated;
+    }
+
+    //done
+    public void updateAlarmsData(JSONArray json) {
+        setPreferencesAlarmsData(json.toString());
+    }
+
+    //done
+    public long getNextAlarmMillis() {
+        return getPreferencesNextMillis();
+    }
+
+    //done
+    private long getPreferencesNextMillis() {
+        return mPref.getLong(KEY_VALUE_MILLIS, 0L);
+    }
+
+    //done
+    @SuppressLint("CommitPrefEdits")
+    private boolean setPreferencesNextMillis(Long millis) {
+        return mPref.edit()
+                .putLong(KEY_VALUE_MILLIS, millis)
+                .commit();
+    }
+
+    //done
     public List<AlarmModel> getAlarmsList() {
         List<AlarmModel> modelList = new ArrayList<>();
         JSONArray models = getJSONArray();
@@ -75,61 +142,76 @@ public class AlarmDataManager {
         return modelList;
     }
 
-    public boolean doIndexUpdate(AlarmModel model, int index) {
-        boolean updated = false;
-        JSONArray before = getJSONArray();
+    //done
+    public JSONArray getJSONArray() {
+        String modelsAsString = getPreferencesAlarmsData();
+        JSONArray modelsAsJSON;
 
-        if (before.length() > 0) {
-            JSONArray after;
-            try {
-                after = before.put(index, model.json);
-                updated = setAlarmKeyValue(after.toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        try {
+            modelsAsJSON = new JSONArray(modelsAsString);
         }
-        return updated;
+        catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(PREF_NAME + " getJSONArray()", "modelsAsString is empty");
+            modelsAsJSON = new JSONArray();
+        }
+        return modelsAsJSON;
     }
 
-    public void doUpdate(JSONArray json) {
-        setAlarmKeyValue(json.toString());
-    }
-
-    public long getNextMillisValue() {
-        return getNextKeyValue();
-    }
-
-    private String getAlarmKeyValue() {
+    //done
+    private String getPreferencesAlarmsData() {
         return mPref.getString(KEY_VALUE_ALARMS, "");
     }
 
-    private boolean setAlarmKeyValue(String string) {
+    //done
+    @SuppressLint("CommitPrefEdits")
+    private boolean setPreferencesAlarmsData(String string) {
         boolean updated = false;
         updated = mPref.edit()
-                    .putString(KEY_VALUE_ALARMS, string)
-                    .commit();
+                .putString(KEY_VALUE_ALARMS, string)
+                .commit();
 
-        //set to zero to force search - takes care of active alarm being deleted from list
-        setNextKeyValue(0L);
-        long nextKey = findNextKey();
-        setNextKeyValue(nextKey);
-
-        // setAlarmKeyValue should only be called within lifecycle
-        // TODO: 16-03-31 Context reference is broken - after dismissing an alarm closing the app and relaunching.
-        ApplicationActivity activity = (ApplicationActivity) mContext;
-        if (!Views.isActivityNull(activity)) {
-            activity.doScheduling(containsActiveAlarm());
-        }
+        update();
 
         return updated;
     }
 
-    private long findNextKey() {
+    //// TODO: 16-04-03
+    private void update() {
+        //set to zero to force search - takes care of active alarm being deleted from list
+        setPreferencesNextMillis(0L);
+        long millis = findNextAlarmMillis();
+        setPreferencesNextMillis(millis);
+
+        MyApplication app = (MyApplication) mContext;
+        app.doScheduling(containsActiveAlarm());
+    }
+
+    //done
+    public long getNextAlarmID() {
+        return getPreferencesNextID();
+    }
+
+    private long getPreferencesNextID() {
+        return mPref.getLong(KEY_VALUE_ALARMS, 0);
+    }
+
+    //done
+    @SuppressLint("CommitPrefEdits")
+    private boolean setPreferencesNextID(long id) {
+        return mPref.edit()
+                .putLong(KEY_VALUE_ID, id)
+                .commit();
+    }
+
+    //// TODO: 16-04-03
+    private long findNextAlarmMillis() {
+        long nextModelID = 0L;
         Calendar calNext = Calendar.getInstance();
         Calendar calNow = Calendar.getInstance();
         Calendar calModel = Calendar.getInstance();
 
-        calNext.setTimeInMillis(getNextKeyValue());
+        calNext.setTimeInMillis(getPreferencesNextMillis());
         calNow.setTimeInMillis(System.currentTimeMillis());
         calModel.setTimeInMillis(System.currentTimeMillis());
 
@@ -143,7 +225,7 @@ public class AlarmDataManager {
 
         List<AlarmModel> alarmList = getAlarmsList();
 
-        if (alarmList.size() > 0){
+        if (alarmList.size() > 0) {
             if (containsActiveAlarm(alarmList)) {
                 for (AlarmModel model : alarmList) {
                     if (model.isActive) {
@@ -152,7 +234,7 @@ public class AlarmDataManager {
                         calModel.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR));
                         calModel.set(Calendar.HOUR_OF_DAY, 0);
                         calModel.set(Calendar.MINUTE, 0);
-                        // set to 5 seconds to flex for midnight calculations and changes to leap seconds
+                        // allow for 5 seconds to be flexible
                         calModel.set(Calendar.SECOND, 5);
                         dateModel = calModel.getTime();
                         Log.d(tag, "<- refreshed (" + dateModel.toString() + ")");
@@ -204,20 +286,24 @@ public class AlarmDataManager {
                                 i++;
                             } while (iterate);
                         }
+
                         // assign dateNext
                         Log.d(tag, dateModel.toString());
                         if (dateNext.getTime() == 0L) {
                             // assign knowing that dateModel is more ideal
                             Log.d(tag, "dateNext.getTime() == 0");
                             dateNext = dateModel;
+                            nextModelID = model.uniqueID;
                         }
                         else {
                             //assign, if dateModel is after dateNow && before current assignment
                             Log.d(tag, "dateNext.getTime() != 0");
                             dateNext = dateModel.after(dateNow) && dateModel.before(dateNext) ?
                                     dateModel : dateNext;
-
+                            nextModelID = dateNext.compareTo(dateModel) == 0 ? model.uniqueID : nextModelID;
                         }
+
+                        setPreferencesNextID(nextModelID);
                     }
                 }
             }
@@ -236,20 +322,12 @@ public class AlarmDataManager {
         return dateNext.getTime();
     }
 
-    private long getNextKeyValue() {
-        return mPref.getLong(KEY_VALUE_NEXT, 0L);
-    }
-
-    private boolean setNextKeyValue(Long millis) {
-        return mPref.edit()
-                .putLong(KEY_VALUE_NEXT, millis)
-                .commit();
-    }
-
+    //// TODO: 16-04-03
     private boolean containsActiveAlarm() {
         return containsActiveAlarm(getAlarmsList());
     }
 
+    //// TODO: 16-04-03
     private boolean containsActiveAlarm(List<AlarmModel> list) {
         boolean schedule = false;
         for (AlarmModel model : list) {
@@ -262,6 +340,7 @@ public class AlarmDataManager {
         return schedule;
     }
 
+    //// TODO: 16-04-03
     private String formatDayOfYear(int dayOfWeek) {
         String day = "";
 
@@ -289,6 +368,7 @@ public class AlarmDataManager {
         return day;
     }
 
+    //// TODO: 16-04-03
     private boolean isDayActive(int dayOfWeek, AlarmModel model) {
         boolean active = false;
 
@@ -316,15 +396,17 @@ public class AlarmDataManager {
         return active;
     }
 
-/*    private void remove(String key) {
+    //done
+    public void remove(String key) {
         mPref.edit()
                 .remove(key)
                 .commit();
     }
 
-    private boolean clear() {
+    //done
+    public boolean clear() {
         return mPref.edit()
                 .clear()
                 .commit();
-    }*/
+    }
 }

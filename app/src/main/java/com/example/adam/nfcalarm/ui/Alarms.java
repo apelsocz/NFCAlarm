@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,11 +15,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.example.adam.nfcalarm.ApplicationActivity;
+import com.example.adam.nfcalarm.AlarmsActivity;
 import com.example.adam.nfcalarm.R;
+import com.example.adam.nfcalarm.data.AlarmDAO;
 import com.example.adam.nfcalarm.data.AlarmDataManager;
 //import com.example.adam.nfcalarm.model.AlarmData;
 import com.example.adam.nfcalarm.model.AlarmModel;
@@ -29,19 +30,19 @@ import com.example.adam.nfcalarm.util.Views;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by adam on 15-12-26.
- */
 public class Alarms extends Fragment {
     public static final String NAME = Alarms.class.getSimpleName();
 
-    private RecyclerView list;
+    private RecyclerView mRecycler;
     private FloatingActionButton mFAB;
     private AlarmDataManager alarmManager;
+    private AlarmDAO alarmDAO;
 
     private static final class CellViewHolder extends ViewHolder implements View.OnClickListener {
 
         private final TextView time;
+        private final TextView repeat;
+        private final ImageView icon;
         private final Switch isActive;
 
         private AlarmModel model;
@@ -49,6 +50,8 @@ public class Alarms extends Fragment {
         private CellViewHolder(View view) {
             super(view);
             time = (TextView) view.findViewById(R.id.alarms_time);
+            repeat = (TextView) view.findViewById(R.id.alarms_repeat);
+            icon = (ImageView) view.findViewById(R.id.alarms_icon);
             isActive = (Switch) view.findViewById(R.id.alarms_active);
         }
 
@@ -59,8 +62,6 @@ public class Alarms extends Fragment {
             this.model = model;
 
             itemView.setOnClickListener(this);
-
-            Context context = this.itemView.getContext();
 
             time.setText(model.hour + ":" + model.minute);
 /*            if (DateFormat.is24HourFormat(context)) {
@@ -73,21 +74,66 @@ public class Alarms extends Fragment {
                 hour = hour > 12 ? hour - 12 : hour;
                 time.setText(hour +":"+ model.minute);
             }*/
-            isActive.setChecked(model.isActive);
 
+/*            String days = "";
+            if (model.sunday && model.monday && model.tuesday && model.wednesday && model.thursday && model.friday && model.saturday){
+                days = "Daily";
+            }
+            else if (model.monday && model.tuesday && model.wednesday && model.thursday && model.friday) {
+                days = "Weekdays";
+            }
+            else if (model.sunday && model.saturday) {
+                days = "Weekends";
+            }
+            else {
+                if (model.once) {
+                    days = "Once";
+                }
+                else {
+                    if (model.sunday) {
+                        days.concat("Sun, ");
+                    }
+                    if (model.monday) {
+                        days.concat("Mon, ");
+                    }
+                    if (model.tuesday) {
+                        days.concat("Tue, ");
+                    }
+                    if (model.wednesday) {
+                        days.concat("Wed, ");
+                    }
+                    if (model.thursday) {
+                        days.concat("Thu, ");
+                    }
+                    if (model.friday) {
+                        days.concat("Fri, ");
+                    }
+                    if (model.saturday) {
+                        days.concat("Sat");
+                    }
+
+                    if (days.endsWith(", ")) {
+                        days.substring(0, days.length() - 2);
+                    }
+                }
+            }
+            repeat.setText(days);
+
+            icon.setImageDrawable( model.isActive ?
+                    ContextCompat.getDrawable(this.itemView.getContext(), R.drawable.ic_alarm_on_white_48dp) :
+                    ContextCompat.getDrawable(this.itemView.getContext(), R.drawable.ic_alarm_off_white_48dp)
+            );*/
+
+            isActive.setChecked(model.isActive);
             isActive.setOnClickListener(this);
-//            isActive.setOnCheckedChangeListener(this);
         }
 
         @Override
         public void onClick(final View view) {
-            ApplicationActivity activity = (ApplicationActivity) view.getContext();
+            AlarmsActivity activity = (AlarmsActivity) view.getContext();
             if (!Views.isActivityNull(activity)) {
                 //create shallow copy of the model and pass it around
                 if (isActive.equals(view)) {
-//                    ((Switch)view).setChecked(true);
-//                    activity.onActiveToggle();
-//                    AlarmModel currentModel = new AlarmModel(!model.isActive, model.hour, model.minute);
                     AlarmModel currentModel = new AlarmModel(model.uniqueID, !model.isActive,
                             model.hour, model.minute, model.once, model.sunday, model.monday,
                             model.tuesday, model.wednesday, model.thursday, model.friday,
@@ -110,20 +156,27 @@ public class Alarms extends Fragment {
 
         private Adapter(@NonNull Context context, List<AlarmModel> items) {
             layoutInflater = LayoutInflater.from(context);
-
             setHasStableIds(true);
-
             this.items = items != null ? items : Collections.<AlarmModel>emptyList();
             itemsSize = this.items.size();
         }
 
         @Override
+        public int getItemViewType(final int position) {
+            // if model is null and only one item, we treat this one as no data - will be used
+            // to load R.layout.contacts_empty_cell. Otherwise regular layout
+            //// TODO: 16-04-05 investigate cause of data showing up
+            AlarmModel model = items.get(position);
+//            return itemsSize == 1 && model.isEmpty ? R.layout.alarms_empty_cell : R.layout.alarms_cell;
+            return model.isEmpty ? R.layout.alarms_empty_cell : R.layout.alarms_cell;
+        }
+
+        @Override
         public ViewHolder onCreateViewHolder(final ViewGroup recyclerView, final int viewType) {
             View view = layoutInflater.inflate(viewType, recyclerView, false);
-
             //for empty cell use ViewHolder otherwise CellViewHolder
-            return R.layout.alarms_empty_cell == viewType ? new ViewHolder(view) {
-            } : new CellViewHolder(view);
+            return R.layout.alarms_empty_cell == viewType ? new ViewHolder(view) {}
+                    : new CellViewHolder(view);
         }
 
         @Override
@@ -139,14 +192,6 @@ public class Alarms extends Fragment {
         }
 
         @Override
-        public int getItemViewType(final int position) {
-            // if model is null and only one item, we treat this one as no data - will be used
-            // to load R.layout.contacts_empty_cell. Otherwise regular layout
-            AlarmModel model = items.get(position);
-            return itemsSize == 1 && model.isEmpty ? R.layout.alarms_empty_cell : R.layout.alarms_cell;
-        }
-
-        @Override
         public long getItemId(final int position) {
             return position;
         }
@@ -155,31 +200,14 @@ public class Alarms extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
         Activity activity = getActivity();
         if (!Views.isActivityNull(activity)) {
             mFAB = (FloatingActionButton) activity.findViewById(R.id.floating_action_btn);
-            mFAB.setOnClickListener(new View.OnClickListener() {
+            mFAB.setOnClickListener( new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Snackbar.make(v, "Thank you!", Snackbar.LENGTH_SHORT)
-                            .show();
-                    //TODO
-                    //show time set alertdialog here and validate that OK is being pressed,
                     //create alarm model and pass it around
-//                    ((ApplicationActivity)activity).onAlarmClick(null);
-                    ((ApplicationActivity)getActivity()).onAlarmClick(AlarmModel.EMPTY);
-
-                    /*
-                    Calendar c = Calendar.getInstance();
-                    boolean is24HourFormat = DateFormat.is24HourFormat(getActivity());
-                    int hour = is24HourFormat ? c.get(Calendar.HOUR_OF_DAY) : c.get(Calendar.HOUR);
-                    int min = c.get(Calendar.MINUTE);
-                    String time = hour+":"+min;
-
-                    DialogFragment dialog = TimePickerDialogFragment.newInstance(hour, min, is24HourFormat);
-                    dialog.show(getFragmentManager(), TimePickerDialogFragment.NAME);
-                    */
+                    ((AlarmsActivity)getActivity()).onAlarmClick(AlarmModel.EMPTY);
                 }
             });
         }
@@ -189,7 +217,7 @@ public class Alarms extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.alarms, container, false);
+        return inflater.inflate(R.layout.alarms_fragment, container, false);
     }
 
     @Override
@@ -197,18 +225,14 @@ public class Alarms extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         alarmManager = AlarmDataManager.getInstance();
+        alarmDAO = new AlarmDAO();
 
-        /*
-//        alarmData = new AlarmData(getActivity());
-        alarmData = new AlarmData(getActivity().getApplicationContext());
-        Activity appActivity = ((ApplicationActivity)getActivity()).getApplicationActivity();
-        alarmData.setApplicationActivity(appActivity);
-        */
-
-        list = (RecyclerView) view;
-        list.setHasFixedSize(true);
-        list.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-        list.setItemAnimator(new DefaultItemAnimator());
+        mRecycler = (RecyclerView) view;
+        mRecycler.setHasFixedSize(true);
+        mRecycler.setLayoutManager( new LinearLayoutManager(
+                getActivity(), LinearLayoutManager.VERTICAL, false)
+        );
+        mRecycler.setItemAnimator( new DefaultItemAnimator() );
 
         setHasOptionsMenu(true);
 
@@ -220,36 +244,27 @@ public class Alarms extends Fragment {
 
         if (!Views.isActivityNull(activity)) {
 //            List<AlarmModel> modelList = alarmData.toList();
-            List<AlarmModel> modelList = alarmManager.getAlarmsList();
+//            List<AlarmModel> modelList = alarmManager.getAlarmsList();
+            List<AlarmModel> modelList = alarmDAO.getModelsAsList();
+            Log.d(NAME, "update(), modelList.size:" + String.valueOf(modelList.size()));
 
             if (modelList.size() == 0) {
                 //no data - add 'null' to fetch R.layout.alarms_empty_cell
+//                modelList.add(AlarmModel.EMPTY);
                 modelList.add(AlarmModel.EMPTY);
             }
 
-            list.setAdapter(new Adapter(activity, modelList));
+            mRecycler.setAdapter( new Adapter(activity, modelList) );
         }
     }
 
     public void toggleAlarm(AlarmModel model, int position) {
         Log.d("Launched", "toggleAlarm()");
-        /*
-//        Activity activity = getActivity();
 
-        JSONArray alarms = alarmData.toJSONArray();
-        try {
-            alarms.put(position, model.json);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        alarmData.setAlarms(alarms);
-        list.swapAdapter(new Adapter(activity, alarmData.toList()), false);
-        */
         Activity activity = getActivity();
         if (!Views.isActivityNull(activity)) {
-            alarmManager.doIndexUpdate(model, position);
-            list.swapAdapter(
+            alarmManager.updateModelAtIndex(model, position);
+            mRecycler.swapAdapter(
                     new Adapter(activity, alarmManager.getAlarmsList()),
                     false
             );

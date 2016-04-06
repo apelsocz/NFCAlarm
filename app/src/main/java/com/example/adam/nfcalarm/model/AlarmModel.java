@@ -47,21 +47,21 @@ public class AlarmModel {
 
         json = j;
 
-        hour = json.optString("alarmHour", "");
-        minute = json.optString("alarmMinute", "");
-        once = json.optBoolean("alarmOnce", true);
-        sunday = json.optBoolean("alarmSun", false);
-        monday = json.optBoolean("alarmMon", false);
-        tuesday = json.optBoolean("alarmTue", false);
-        wednesday = json.optBoolean("alarmWed", false);
-        thursday = json.optBoolean("alarmThu", false);
-        friday = json.optBoolean("alarmFri", false);
-        saturday = json.optBoolean("alarmSat", false);
-        isActive = json.optBoolean("alarmActive", false);
+        hour = json.optString("hr", "");
+        minute = json.optString("mn", "");
+        once = json.optBoolean("on", true);
+        sunday = json.optBoolean("su", false);
+        monday = json.optBoolean("mo", false);
+        tuesday = json.optBoolean("tu", false);
+        wednesday = json.optBoolean("we", false);
+        thursday = json.optBoolean("th", false);
+        friday = json.optBoolean("fr", false);
+        saturday = json.optBoolean("sa", false);
+        isActive = json.optBoolean("ac", false);
 
         isEmpty = json.length() == 0 || TextUtils.isEmpty(hour) || TextUtils.isEmpty(minute);
         // this may cause errors depending on how AlarmModel is being handled - investigate
-        uniqueID = isEmpty ? 0 : json.optLong("alarmID", System.currentTimeMillis());
+        uniqueID = isEmpty ? 0 : json.optLong("id", System.currentTimeMillis());
     }
 
     public AlarmModel(final long uniqueID, final boolean isActive, final String hour, final String minute,
@@ -85,18 +85,18 @@ public class AlarmModel {
         json = new JSONObject();
 
         try {
-            json.put("alarmHour", !TextUtils.isEmpty(this.hour) ? this.hour : "");
-            json.put("alarmMinute", !TextUtils.isEmpty(this.minute) ? this.minute : "");
-            json.put("alarmActive", this.isActive);
-            json.put("alarmID", this.uniqueID > 0 ? this.uniqueID : System.currentTimeMillis());
-            json.put("alarmOnce", this.once);
-            json.put("alarmSun", !this.once && this.sunday);
-            json.put("alarmMon", !this.once && this.monday);
-            json.put("alarmTue", !this.once && this.tuesday);
-            json.put("alarmWed", !this.once && this.wednesday);
-            json.put("alarmThu", !this.once && this.thursday);
-            json.put("alarmFri", !this.once && this.friday);
-            json.put("alarmSat", !this.once && this.saturday);
+            json.put("hr", !TextUtils.isEmpty(this.hour) ? this.hour : "");
+            json.put("mm", !TextUtils.isEmpty(this.minute) ? this.minute : "");
+            json.put("ac", this.isActive);
+            json.put("id", this.uniqueID > 0 ? this.uniqueID : System.currentTimeMillis());
+            json.put("on", this.once);
+            json.put("su", !this.once && this.sunday);
+            json.put("mo", !this.once && this.monday);
+            json.put("tu", !this.once && this.tuesday);
+            json.put("we", !this.once && this.wednesday);
+            json.put("th", !this.once && this.thursday);
+            json.put("fr", !this.once && this.friday);
+            json.put("sa", !this.once && this.saturday);
         }
         catch (JSONException e) {
             e.printStackTrace();

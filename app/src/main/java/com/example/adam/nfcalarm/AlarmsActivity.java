@@ -1,31 +1,23 @@
 package com.example.adam.nfcalarm;
 
-import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.adam.nfcalarm.data.AlarmDAO;
 import com.example.adam.nfcalarm.data.AlarmDataManager;
 import com.example.adam.nfcalarm.model.AlarmModel;
-import com.example.adam.nfcalarm.scheduler.AlarmService;
-import com.example.adam.nfcalarm.scheduler.WakefulAlarmReceiver;
 import com.example.adam.nfcalarm.ui.Alarms;
-import com.example.adam.nfcalarm.ui.Content;
 import com.example.adam.nfcalarm.ui.Edit;
-import com.example.adam.nfcalarm.ui.Display;
 
 import org.json.JSONArray;
 
-public class ApplicationActivity extends AppCompatActivity {
+public class AlarmsActivity extends AppCompatActivity {
     //// TODO: 16-03-13 App needs to be aware of shifts in time
     // - change in longitude / latitude
     // - manually update timezone
@@ -34,17 +26,21 @@ public class ApplicationActivity extends AppCompatActivity {
     // - day light savings time
 
     // TODO: 16-03-26 if once, disable alarm when it went off
-    public static final String NAME = ApplicationActivity.class.getSimpleName();
+    public static final String NAME = AlarmsActivity.class.getSimpleName();
+    private AlarmDAO mAlarmDAO;
+
+/*
     private WakefulAlarmReceiver alarmReceiver = new WakefulAlarmReceiver();
+*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AlarmDataManager.initializeInstance(this);
 
         setContentView(R.layout.activity_application);
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
+        mAlarmDAO = new AlarmDAO();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -75,20 +71,7 @@ public class ApplicationActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void setTime(TimePicker view, int hourOfDay, int minute){
-        ((Content)getSupportFragmentManager().findFragmentByTag(Content.NAME)).doTimeSet(view, hourOfDay, minute);
-        Toast.makeText(getApplicationContext(), String.valueOf(view.is24HourView()), Toast.LENGTH_SHORT).show();
-    }
-
-    public void setCycle(boolean[] items){
-        //update sharedpreferences - once user has hit OK
-        ((Content)getSupportFragmentManager().findFragmentByTag(Content.NAME)).doFrequencySet(items);
-    }
-
-    public void setActive(boolean isSet){
-        ((Content)getSupportFragmentManager().findFragmentByTag(Content.NAME)).doSchedule(isSet);
-    }
-
+    // Called from Alarms.java
     public void onAlarmClick(AlarmModel model) {
         FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -105,8 +88,10 @@ public class ApplicationActivity extends AppCompatActivity {
     public void onEditUpdate() {
         FragmentManager fragmentManager = getSupportFragmentManager();
 
+        // remove previous instance of edit
         fragmentManager.popBackStackImmediate(Edit.NAME, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
+        // add new instance
         Alarms alarms = (Alarms) fragmentManager.findFragmentByTag(Alarms.NAME);
         if (alarms != null) {
             alarms.update();
@@ -121,16 +106,16 @@ public class ApplicationActivity extends AppCompatActivity {
     }
 
     public void doAlarmsUpdate(JSONArray json) {
-        AlarmDataManager alarmManager = AlarmDataManager.getInstance();
-        alarmManager.doUpdate(json);
+//        AlarmDataManager.getInstance().updateAlarmsData(json);
+        mAlarmDAO.addModels(json);
     }
 
-    public void doScheduling(boolean scheduleAlarm) {
+/*    public void doScheduling(boolean scheduleAlarm) {
         if (scheduleAlarm) {
             alarmReceiver.setAlarm(this);
         }
         else if (!scheduleAlarm) {
             alarmReceiver.cancelAlarm(this);
         }
-    }
+    }*/
 }

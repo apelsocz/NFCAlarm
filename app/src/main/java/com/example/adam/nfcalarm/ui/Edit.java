@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,8 +18,9 @@ import android.widget.CheckBox;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.example.adam.nfcalarm.ApplicationActivity;
+import com.example.adam.nfcalarm.AlarmsActivity;
 import com.example.adam.nfcalarm.R;
+import com.example.adam.nfcalarm.data.AlarmDAO;
 import com.example.adam.nfcalarm.data.AlarmDataManager;
 //import com.example.adam.nfcalarm.model.AlarmData;
 import com.example.adam.nfcalarm.model.AlarmModel;
@@ -28,7 +30,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by adam on 15-12-30.
@@ -60,8 +61,7 @@ public class Edit extends Fragment implements View.OnClickListener {
     private CheckBox saturday;
 
     private long uniqueID;
-//    private AlarmData alarmData;
-    private AlarmDataManager alarmManager;
+    AlarmDAO mAlarmDAO;
     private JSONArray alarms;
     private int savedModelIndex;
 
@@ -109,7 +109,8 @@ public class Edit extends Fragment implements View.OnClickListener {
 
         setHasOptionsMenu(true);
 
-        alarmManager = AlarmDataManager.getInstance();
+//        alarmManager = AlarmDataManager.getInstance();
+        mAlarmDAO = new AlarmDAO();
 
         // retrieve the model being edited, either in savedinstance or the fragments bundle
         String modelAsString = savedInstanceState != null && savedInstanceState.containsKey(MODEL_KEY) ?
@@ -117,10 +118,10 @@ public class Edit extends Fragment implements View.OnClickListener {
 
         currentModel = new AlarmModel(modelAsString);
         uniqueID = currentModel.uniqueID;
-        alarms = alarmManager.getJSONArray();
+//        alarms = alarmManager.getJSONArray();
+        alarms = mAlarmDAO.getModelsAsJSON();
 
         savedModelIndex = -1;
-        // // TODO: 16-01-19 Investigate, retrieving length may not be viable - JSONArray Null value expected
         int length = alarms.length();
         if (length > 0 && !currentModel.isEmpty) {
             for (int i = 0; i < length; i++) {
@@ -139,7 +140,7 @@ public class Edit extends Fragment implements View.OnClickListener {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.edit, menu);
 
-        // hide order menu item - defined in ContactFragment
+        // hide settings menu item
         final MenuItem settingsMenuItem = menu.findItem(R.id.action_settings);
         if (settingsMenuItem != null) {
             settingsMenuItem.setVisible(false);
@@ -157,6 +158,7 @@ public class Edit extends Fragment implements View.OnClickListener {
         }
 
         AlarmModel currentModel = toAlarmModel();
+        Log.d(NAME, currentModel.json.toString());
 
         // // TODO: 16-01-20 investigate use of isUpdated
         boolean isUpdated = false;
@@ -172,8 +174,7 @@ public class Edit extends Fragment implements View.OnClickListener {
                         else {
                             alarms.put(currentModel.json);
                         }
-                        /*alarmData.setAlarms(alarms);*/
-                        ((ApplicationActivity)activity).doAlarmsUpdate(alarms);
+                        ((AlarmsActivity)activity).doAlarmsUpdate(alarms);
                         isUpdated = true;
                     }
                     catch (JSONException e) {
@@ -187,15 +188,14 @@ public class Edit extends Fragment implements View.OnClickListener {
             case R.id.delete:
                 if (savedModelIndex > -1) {
                     alarms.remove(savedModelIndex);
-                    /*alarmData.setAlarms(alarms);*/
-                    ((ApplicationActivity)activity).doAlarmsUpdate(alarms);
+                    ((AlarmsActivity)activity).doAlarmsUpdate(alarms);
                 }
                 isUpdated = true;
                 break;
         }
 
         if (isUpdated) {
-            ((ApplicationActivity)activity).onEditUpdate();
+            ((AlarmsActivity)activity).onEditUpdate();
         }
 
         return isUpdated;
@@ -265,16 +265,6 @@ public class Edit extends Fragment implements View.OnClickListener {
                 friday.isChecked(),
                 saturday.isChecked()
         );
-    }
-
-    public void showTimePickerDialogFragment() {
-        Calendar c = Calendar.getInstance();
-        boolean is24HourFormat = DateFormat.is24HourFormat(getActivity());
-        int hour = is24HourFormat ? c.get(Calendar.HOUR_OF_DAY) : c.get(Calendar.HOUR);
-        int minute = c.get(Calendar.MINUTE);
-
-        DialogFragment myDialogFragment = TimePickerDialogFragment.newInstance(hour, minute, is24HourFormat);
-        myDialogFragment.show(getFragmentManager(), TimePickerDialogFragment.NAME);
     }
 
     @Override

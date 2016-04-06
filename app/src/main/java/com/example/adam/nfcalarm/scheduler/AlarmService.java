@@ -10,7 +10,8 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import com.example.adam.nfcalarm.AlarmActivity;
+
+import com.example.adam.nfcalarm.RingingActivity;
 import com.example.adam.nfcalarm.R;
 import com.example.adam.nfcalarm.data.AlarmDataManager;
 import java.io.IOException;
@@ -70,29 +71,33 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
 
         long millis;
         try {
-            millis = AlarmDataManager.getInstance().getNextMillisValue();
+            millis = AlarmDataManager.getInstance().getNextAlarmMillis();
         } catch (IllegalStateException e) {
             AlarmDataManager.initializeInstance(getApplicationContext());
-            millis = AlarmDataManager.getInstance().getNextMillisValue();
+            millis = AlarmDataManager.getInstance().getNextAlarmMillis();
         }
         Date d = new Date(millis);
         DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT);
 
         // TODO: 16-03-27 modify intent to only create a new activity if activity is not already running
-        Intent activityIntent = new Intent(getApplicationContext(), AlarmActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0 , activityIntent, 0);
+        Intent intentActivity = new Intent(getApplicationContext(), RingingActivity.class);
 
-        Intent doneIntent = new Intent(getApplicationContext(), AlarmActivity.class);
-        doneIntent.setAction(AlarmActivity.ACTION_DISMISS_ALARM);
-        PendingIntent donePending = PendingIntent.getActivity(getApplicationContext(), 0, doneIntent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent content = PendingIntent.getActivity(
+                getApplicationContext(), 0, new Intent(getApplicationContext(), RingingActivity.class), 0);
 
-        NotificationCompat.Action dismiss = new NotificationCompat.Action(R.drawable.icon_nfc, "Done", donePending);
+        Intent intentSnooze = intentActivity;
+        intentSnooze.setAction(RingingActivity.ACTION_SNOOZE_ALARM);
+        PendingIntent pendingSnooze = PendingIntent.getActivity(
+                getApplicationContext(), 0, intentSnooze, PendingIntent.FLAG_ONE_SHOT);
+
+        NotificationCompat.Action dismiss = new NotificationCompat.Action(
+                R.drawable.icon_nfc, "Done", pendingSnooze);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.icon_nfc)
                 .setContentTitle("Active Alarm")
                 .setContentText(tf.format(d))
-                .setContentIntent(contentIntent)
+                .setContentIntent(content)
                 .setShowWhen(false)
                 .setAutoCancel(false)
                 .setOngoing(true)
