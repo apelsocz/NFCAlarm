@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.example.adam.nfcalarm.data.AlarmDataManager;
 import com.example.adam.nfcalarm.scheduler.AlarmService;
-import com.example.adam.nfcalarm.ui.Display;
+import com.example.adam.nfcalarm.ui.Ringing;
 
 public class RingingActivity extends AppCompatActivity {
 
@@ -32,7 +32,7 @@ public class RingingActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.alarmContainer, new Display(), Display.NAME)
+                    .add(R.id.alarmContainer, new Ringing(), Ringing.NAME)
                     .commit();
         }
     }

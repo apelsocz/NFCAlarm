@@ -22,8 +22,8 @@ import com.example.adam.nfcalarm.R;
 import java.text.DateFormat;
 import java.util.Calendar;
 
-public class Display extends Fragment {
-    public static final String NAME = Display.class.getName();
+public class Ringing extends Fragment {
+    public static final String NAME = Ringing.class.getName();
 
     private TextView mTime;
     private TextView mDate;

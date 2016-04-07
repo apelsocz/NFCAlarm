@@ -25,7 +25,6 @@ public class AlarmsActivity extends AppCompatActivity {
     // - leap seconds
     // - day light savings time
 
-    // TODO: 16-03-26 if once, disable alarm when it went off
     public static final String NAME = AlarmsActivity.class.getSimpleName();
     private AlarmDAO mAlarmDAO;
 

@@ -86,7 +86,7 @@ public class AlarmModel {
 
         try {
             json.put("hr", !TextUtils.isEmpty(this.hour) ? this.hour : "");
-            json.put("mm", !TextUtils.isEmpty(this.minute) ? this.minute : "");
+            json.put("mn", !TextUtils.isEmpty(this.minute) ? this.minute : "");
             json.put("ac", this.isActive);
             json.put("id", this.uniqueID > 0 ? this.uniqueID : System.currentTimeMillis());
             json.put("on", this.once);

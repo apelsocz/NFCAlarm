@@ -168,15 +168,31 @@ public class Alarms extends Fragment {
             //// TODO: 16-04-05 investigate cause of data showing up
             AlarmModel model = items.get(position);
 //            return itemsSize == 1 && model.isEmpty ? R.layout.alarms_empty_cell : R.layout.alarms_cell;
-            return model.isEmpty ? R.layout.alarms_empty_cell : R.layout.alarms_cell;
+            boolean retBoolean = model.isEmpty;
+            int vtype = model.isEmpty ? R.layout.alarms_empty_cell : R.layout.alarms_cell;
+
+            int alarmsCell = R.layout.alarms_cell;
+            int emptyCell = R.layout.alarms_empty_cell;
+
+//            return model.isEmpty ? R.layout.alarms_empty_cell : R.layout.alarms_cell;
+            return vtype;
         }
 
         @Override
         public ViewHolder onCreateViewHolder(final ViewGroup recyclerView, final int viewType) {
             View view = layoutInflater.inflate(viewType, recyclerView, false);
+
+            boolean vTypeIsEmptyCell = viewType == R.layout.alarms_empty_cell;
+
+            if (viewType == R.layout.alarms_empty_cell) {
+                return new ViewHolder(view) {};
+            }
+            else {
+                return new CellViewHolder(view);
+            }
             //for empty cell use ViewHolder otherwise CellViewHolder
-            return R.layout.alarms_empty_cell == viewType ? new ViewHolder(view) {}
-                    : new CellViewHolder(view);
+/*            return R.layout.alarms_empty_cell == viewType ? new ViewHolder(view) {}
+                    : new CellViewHolder(view);*/
         }
 
         @Override
@@ -227,11 +243,24 @@ public class Alarms extends Fragment {
         alarmManager = AlarmDataManager.getInstance();
         alarmDAO = new AlarmDAO();
 
+        RecyclerView.LayoutManager layoutManager = new RecyclerView.LayoutManager() {
+            @Override
+            public RecyclerView.LayoutParams generateDefaultLayoutParams() {
+                return null;
+            }
+
+            @Override
+            public void onAdapterChanged(RecyclerView.Adapter oldAdapter, RecyclerView.Adapter newAdapter) {
+                super.onAdapterChanged(oldAdapter, newAdapter);
+            }
+        };
+
         mRecycler = (RecyclerView) view;
         mRecycler.setHasFixedSize(true);
-        mRecycler.setLayoutManager( new LinearLayoutManager(
-                getActivity(), LinearLayoutManager.VERTICAL, false)
-        );
+//        mRecycler.setLayoutManager( new LinearLayoutManager(
+//                getActivity(), LinearLayoutManager.VERTICAL, false)
+//        );
+        mRecycler.setLayoutManager(layoutManager);
         mRecycler.setItemAnimator( new DefaultItemAnimator() );
 
         setHasOptionsMenu(true);
