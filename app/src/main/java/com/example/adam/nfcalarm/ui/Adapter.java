@@ -2,6 +2,7 @@ package com.example.adam.nfcalarm.ui;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
@@ -60,14 +61,17 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
                 time.setText(hour +":"+ model.minute);
             }*/
 
-/*            String days = "";
-            if (model.sunday && model.monday && model.tuesday && model.wednesday && model.thursday && model.friday && model.saturday){
+            String days = "";
+            if (model.sunday && model.monday && model.tuesday && model.wednesday
+                    && model.thursday && model.friday && model.saturday) {
                 days = "Daily";
             }
-            else if (model.monday && model.tuesday && model.wednesday && model.thursday && model.friday) {
+            else if (!model.sunday && model.monday && model.tuesday && model.wednesday
+                    && model.thursday && model.friday && !model.saturday) {
                 days = "Weekdays";
             }
-            else if (model.sunday && model.saturday) {
+            else if (model.sunday && !model.monday && !model.tuesday && !model.wednesday
+                    && !model.thursday && !model.friday && model.saturday) {
                 days = "Weekends";
             }
             else {
@@ -76,38 +80,38 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
                 }
                 else {
                     if (model.sunday) {
-                        days.concat("Sun, ");
+                        days += "Sun, ";
                     }
                     if (model.monday) {
-                        days.concat("Mon, ");
+                        days += "Mon, ";
                     }
                     if (model.tuesday) {
-                        days.concat("Tue, ");
+                        days += "Tue, ";
                     }
                     if (model.wednesday) {
-                        days.concat("Wed, ");
+                        days += "Wed, ";
                     }
                     if (model.thursday) {
-                        days.concat("Thu, ");
+                        days += "Thu, ";
                     }
                     if (model.friday) {
-                        days.concat("Fri, ");
+                        days += "Fri, ";
                     }
                     if (model.saturday) {
-                        days.concat("Sat");
+                        days += "Sat";
                     }
 
                     if (days.endsWith(", ")) {
-                        days.substring(0, days.length() - 2);
+                        days = days.substring(0, days.length() - 2);
                     }
                 }
             }
             repeat.setText(days);
 
-            icon.setImageDrawable( model.isActive ?
-                    ContextCompat.getDrawable(this.itemView.getContext(), R.drawable.ic_alarm_on_white_48dp) :
-                    ContextCompat.getDrawable(this.itemView.getContext(), R.drawable.ic_alarm_off_white_48dp)
-            );*/
+            Context context = itemView.getContext();
+            int id = model.isActive ? R.drawable.ic_alarm_on_white_48dp :
+                    R.drawable.ic_alarm_off_white_48dp;
+            icon.setImageDrawable(ContextCompat.getDrawable(context, id));
 
             isActive.setChecked(model.isActive);
             isActive.setOnClickListener(this);
@@ -124,7 +128,7 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
                             model.tuesday, model.wednesday, model.thursday, model.friday,
                             model.saturday);
                     update(currentModel);
-                    activity.onActiveToggle(currentModel, CellViewHolder.this.getAdapterPosition());
+                    activity.onActiveToggle(model);
                 }
                 else {
                     activity.onAlarmClick(model);

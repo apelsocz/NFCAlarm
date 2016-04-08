@@ -98,10 +98,10 @@ public class AlarmsActivity extends AppCompatActivity {
         }
     }
 
-    public void onActiveToggle(AlarmModel model, int position) {
+    public void onActiveToggle(AlarmModel model) {
         Alarms alarms = (Alarms) getSupportFragmentManager().findFragmentByTag(Alarms.NAME);
         if (alarms != null) {
-            alarms.toggleAlarm(model, position);
+            alarms.toggleAlarm(model);
         }
     }
 

@@ -65,8 +65,30 @@ public class AlarmDAO implements DAOInterface {
 
     @Override
     public void updateModel(AlarmModel model) {
+        List<AlarmModel> list = mList;
+        int length = list.size();
 
-        write();
+        if (length > 0) {
+            if (list.contains(model)) {
+                int index = list.indexOf(model);
+                list.remove(model);
+                list.add(index, model);
+
+                Log.d(NAME, mJSON.toString());
+
+                try {
+                    JSONArray update = new JSONArray();
+                    for (int i = 0; i < length; i++) {
+                        update.put(i, list.get(i).json);
+                    }
+                    mJSON = update;
+                    write();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d(NAME, mJSON.toString());
+            }
+        }
     }
 
     @Override

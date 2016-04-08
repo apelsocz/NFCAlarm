@@ -106,26 +106,18 @@ public class Alarms extends Fragment {
         }
 
         if (mRecycler != null) {
-            mRecycler.requestLayout();
+//            mRecycler.requestLayout();
             mAdapter = new Adapter(getActivity(), mList);
             mRecycler.swapAdapter(mAdapter, false);
         }
     }
 
-    public void toggleAlarm(AlarmModel model, int position) {
+    public void toggleAlarm(AlarmModel model) {
         Log.d("Launched", "toggleAlarm()");
 
-        Activity activity = getActivity();
-        if (!Views.isActivityNull(activity)) {
-            alarmManager.updateModelAtIndex(model, position);
-            mRecycler.swapAdapter(
-                    new Adapter(activity, alarmManager.getAlarmsList()),
-                    false
-            );
-        }
+            alarmDAO.updateModel(model);
+            mRecycler.swapAdapter( new Adapter(getActivity(), alarmDAO.getModelsAsList()), false );
     }
-
-
 /*
     private static final class CellViewHolder extends ViewHolder implements View.OnClickListener {
 
@@ -308,5 +300,4 @@ public class Alarms extends Fragment {
         }
     }
 */
-
 }
