@@ -13,7 +13,6 @@ public interface DAOInterface {
     public List<AlarmModel> getModelsAsList();
     public JSONArray getModelsAsJSON();
     public AlarmModel getModel(long id);
-    public void addModels(JSONArray json);
+    public void setModels(JSONArray json);
     public void updateModel(AlarmModel model);
-    public void deleteModel(AlarmModel model);
 }

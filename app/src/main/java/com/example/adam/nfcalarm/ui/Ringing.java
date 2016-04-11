@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.adam.nfcalarm.RingingActivity;
@@ -28,6 +29,8 @@ public class Ringing extends Fragment {
     private TextView mTime;
     private TextView mDate;
     private ImageView mBackground;
+    private TextView mMessage;
+    private ProgressBar mProgress;
     private FloatingActionButton mFAB;
 
     private BroadcastReceiver mTimeTickReceiver = new BroadcastReceiver() {
@@ -50,13 +53,14 @@ public class Ringing extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.alarm_display, container, false);
 
         mTime = (TextView) rootView.findViewById(R.id.display_time);
         mDate = (TextView) rootView.findViewById(R.id.display_date);
         mBackground = (ImageView) rootView.findViewById(R.id.display_background);
+        mProgress = (ProgressBar) rootView.findViewById(R.id.display_progress);
+        mMessage = (TextView) rootView.findViewById(R.id.display_message);
 
         return rootView;
     }
@@ -102,10 +106,20 @@ public class Ringing extends Fragment {
     }
 
     public void snooze() {
-        // TODO: 16-04-02 set text label
+        mTime.setVisibility(View.INVISIBLE);
+        mDate.setVisibility(View.INVISIBLE);
+        mProgress.setVisibility(View.INVISIBLE);
+        mFAB.setVisibility(View.INVISIBLE);
+        mMessage.setText("Snoozing !");
+        mMessage.setVisibility(View.VISIBLE);
     }
 
     public void dismiss() {
-        // TODO: 16-04-02 set text label
+        mTime.setVisibility(View.INVISIBLE);
+        mDate.setVisibility(View.INVISIBLE);
+        mProgress.setVisibility(View.INVISIBLE);
+        mFAB.setVisibility(View.INVISIBLE);
+        mMessage.setText("Dismissed !");
+        mMessage.setVisibility(View.VISIBLE);
     }
 }

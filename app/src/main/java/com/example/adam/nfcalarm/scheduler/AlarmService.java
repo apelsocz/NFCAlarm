@@ -13,6 +13,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.example.adam.nfcalarm.RingingActivity;
 import com.example.adam.nfcalarm.R;
+import com.example.adam.nfcalarm.data.AlarmDAO;
 import com.example.adam.nfcalarm.data.AlarmDataManager;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -69,13 +70,14 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
 
     private void showNotification() {
 
-        long millis;
-        try {
-            millis = AlarmDataManager.getInstance().getNextAlarmMillis();
-        } catch (IllegalStateException e) {
-            AlarmDataManager.initializeInstance(getApplicationContext());
-            millis = AlarmDataManager.getInstance().getNextAlarmMillis();
-        }
+        AlarmDAO alarmDAO = new AlarmDAO();
+        long millis = alarmDAO.getScheduledMillis();
+//        try {
+//            millis = AlarmDataManager.getInstance().getNextAlarmMillis();
+//        } catch (IllegalStateException e) {
+//            AlarmDataManager.initializeInstance(getApplicationContext());
+//            millis = AlarmDataManager.getInstance().getNextAlarmMillis();
+//        }
         Date d = new Date(millis);
         DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT);
 

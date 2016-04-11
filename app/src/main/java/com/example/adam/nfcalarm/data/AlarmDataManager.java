@@ -57,7 +57,7 @@ public class AlarmDataManager {
         return sInstance;
     }
 
-    // TODO: 16-04-03
+    // done
     public void doAlarmDismissed(long id) {
         List<AlarmModel> list = getAlarmsList();
         for (AlarmModel model : list) {
@@ -87,7 +87,7 @@ public class AlarmDataManager {
         return null;
     }
 
-    // TODO: 16-04-03  AlarmDAO
+    // done
     public boolean updateModelAtIndex(AlarmModel model, int index) {
         boolean updated = false;
         JSONArray before = getJSONArray();
@@ -192,6 +192,7 @@ public class AlarmDataManager {
         return getPreferencesNextID();
     }
 
+    //done
     private long getPreferencesNextID() {
         return mPref.getLong(KEY_VALUE_ALARMS, 0);
     }
@@ -204,7 +205,7 @@ public class AlarmDataManager {
                 .commit();
     }
 
-    //// TODO: 16-04-03
+    // done
     private long findNextAlarmMillis() {
         long nextModelID = 0L;
         Calendar calNext = Calendar.getInstance();
@@ -327,7 +328,7 @@ public class AlarmDataManager {
         return containsActiveAlarm(getAlarmsList());
     }
 
-    //// TODO: 16-04-03
+    // done
     private boolean containsActiveAlarm(List<AlarmModel> list) {
         boolean schedule = false;
         for (AlarmModel model : list) {
@@ -340,7 +341,7 @@ public class AlarmDataManager {
         return schedule;
     }
 
-    //// TODO: 16-04-03
+    // done
     private String formatDayOfYear(int dayOfWeek) {
         String day = "";
 
@@ -368,7 +369,7 @@ public class AlarmDataManager {
         return day;
     }
 
-    //// TODO: 16-04-03
+    // done
     private boolean isDayActive(int dayOfWeek, AlarmModel model) {
         boolean active = false;
 

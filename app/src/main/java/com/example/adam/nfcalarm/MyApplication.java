@@ -19,6 +19,8 @@ public class MyApplication extends Application {
         return mInstance;
     }
 
+    //// TODO: 16-04-08 add prompt - would you like to repeat this tomorrow? if model.once
+
     /*
      *  Called when the application is starting,
      *  before any other application objects have been created.
@@ -36,15 +38,15 @@ public class MyApplication extends Application {
         return isRinging;
     }
 
-    public void setAlarmRinging(boolean b) {
-        isRinging = b;
+    public void setAlarmRinging(boolean isRinging) {
+        this.isRinging = isRinging;
     }
 
-    public void doScheduling(boolean scheduleAlarm) {
-        if (scheduleAlarm) {
+    public void doScheduling(boolean schedule) {
+        if (schedule) {
             alarmReceiver.setAlarm(this);
         }
-        else if (!scheduleAlarm) {
+        else if (!schedule) {
             alarmReceiver.cancelAlarm(this);
         }
     }

@@ -8,9 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
-
-import com.example.adam.nfcalarm.data.AlarmDataManager;
-//import com.example.adam.nfcalarm.model.AlarmData;
+import com.example.adam.nfcalarm.data.AlarmDAO;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -24,6 +22,8 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
     private AlarmManager alarmMgr;
     // pending intent that is triggered when the alarm fires.
     private PendingIntent alarmIntent;
+    // provides access to data layer
+    private AlarmDAO mAlarmDAO;
 
     public void onReceive(Context context, Intent intent) {
         Log.d("WakefulAlarmReceiver", "{onReceive}");
@@ -51,7 +51,9 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         Intent intent = new Intent(context, WakefulAlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
-        long millis = AlarmDataManager.getInstance().getNextAlarmMillis();
+//        long millis = AlarmDataManager.getInstance().getNextAlarmMillis();
+        mAlarmDAO = new AlarmDAO();
+        long millis = mAlarmDAO.getScheduledMillis();
 
         // for development purposes only
         Calendar calendar = Calendar.getInstance();
@@ -59,7 +61,7 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         calendar.add(Calendar.SECOND, 5);
         Date date = calendar.getTime();
         Log.d("WakefulAlarmReceiver", date.toString());
-//        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, date.getTime(), alarmIntent);
+        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, date.getTime(), alarmIntent);
 
 //        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, millis, getPending(context));
 
@@ -94,7 +96,6 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
     }
 
     public void snooze(Context context) {
-
         alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, WakefulAlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
@@ -105,10 +106,5 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         Date date = calendar.getTime();
         Log.d("WakefulAlarmReceiver", "snooze()");
         alarmMgr.setExact(AlarmManager.RTC_WAKEUP, date.getTime(), alarmIntent);
-    }
-
-    public void dismiss(Context context) {
-        //model.once -> disable
-        //setAlarm()
     }
 }

@@ -2,38 +2,44 @@ package com.example.adam.nfcalarm.data;
 
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 import com.example.adam.nfcalarm.MyApplication;
 import com.example.adam.nfcalarm.model.AlarmModel;
+import com.example.adam.nfcalarm.util.Data;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AlarmDAO implements DAOInterface {
     private static final String NAME = AlarmDAO.class.getSimpleName();
 
-    private Context mContext;
-    private PreferencesManager mPrefMgr;
+    private PreferencesManager mPrefsMngr;
+
     private List<AlarmModel> mList;
     private JSONArray mJSON;
 
     public AlarmDAO() {
-        mContext = MyApplication.getInstance().getApplicationContext();
+        Context context = MyApplication.getInstance().getApplicationContext();
         mList = new ArrayList<>();
         mJSON = new JSONArray();
 
         try {
-            mPrefMgr = PreferencesManager.getInstance();
+            mPrefsMngr = PreferencesManager.getInstance();
         } catch (IllegalStateException e) {
             Log.e(NAME, e.getMessage());
-            PreferencesManager.initializeInstance(mContext);
-            mPrefMgr = PreferencesManager.getInstance();
+            PreferencesManager.initializeInstance(context);
+            mPrefsMngr = PreferencesManager.getInstance();
         }
-        read();
+
+        String modelsAsString = mPrefsMngr.getKeyValueString(PreferencesManager.KEY_VALUE_ALARMS);
+        mJSON = Data.modelsAsJSON(modelsAsString);
+        mList = Data.modelsAsList(mJSON);
+
+//        read();
     }
 
     @Override
@@ -58,7 +64,7 @@ public class AlarmDAO implements DAOInterface {
     }
 
     @Override
-    public void addModels(JSONArray json) {
+    public void setModels(JSONArray json) {
         mJSON = json;
         write();
     }
@@ -74,7 +80,7 @@ public class AlarmDAO implements DAOInterface {
                 list.remove(model);
                 list.add(index, model);
 
-                Log.d(NAME, mJSON.toString());
+                Log.d(NAME + " - update()", mJSON.toString());
 
                 try {
                     JSONArray update = new JSONArray();
@@ -86,48 +92,54 @@ public class AlarmDAO implements DAOInterface {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.d(NAME, mJSON.toString());
+                Log.d(NAME + " - update()", mJSON.toString());
             }
         }
-    }
-
-    @Override
-    public void deleteModel(AlarmModel model) {
-
-        write();
     }
 
     private void read() {
-        readAlarms();
+        String modelsAsString = mPrefsMngr.getKeyValueString(PreferencesManager.KEY_VALUE_ALARMS);
+        mJSON = Data.modelsAsJSON(modelsAsString);
+        mList = Data.modelsAsList(mJSON);
+//        readAlarms();
     }
 
-    private void readAlarms() {
-        readJSON();
-        List<AlarmModel> modelsAsList = new ArrayList<>();
+//    private void readAlarms() {
+//        readJSON();
+//        List<AlarmModel> modelsAsList = new ArrayList<>();
+//
+//        int length = mJSON.length();
+//        if (length > 0) {
+//            for (int i = 0; i < length; i++) {
+//                modelsAsList.add(new AlarmModel(mJSON.optString(i)));
+//            }
+//        }
+//        mList = modelsAsList;
+//    }
 
-        int length = mJSON.length();
-        if (length > 0) {
-            for (int i = 0; i < length; i++) {
-                modelsAsList.add(new AlarmModel(mJSON.optString(i)));
-            }
-        }
-        mList = modelsAsList;
-    }
-
-    private void readJSON() {
-        String modelsAsString = mPrefMgr.getKeyValueString(PreferencesManager.KEY_VALUE_ALARMS);
-        JSONArray modelsAsJSON;
-        try {
-            modelsAsJSON = new JSONArray(modelsAsString);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e(NAME, e.getMessage());
-            modelsAsJSON = new JSONArray();
-        }
-        mJSON = modelsAsJSON;
-    }
+//    private void readJSON() {
+//        String modelsAsString = mPrefsMngr.getKeyValueString(PreferencesManager.KEY_VALUE_ALARMS);
+//        JSONArray modelsAsJSON;
+//        try {
+//            modelsAsJSON = new JSONArray(modelsAsString);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//            Log.e(NAME, e.getMessage());
+//            modelsAsJSON = new JSONArray();
+//        }
+//        mJSON = modelsAsJSON;
+//    }
 
     private void write() {
-        mPrefMgr.setKeyValue(PreferencesManager.KEY_VALUE_ALARMS, mJSON.toString());
+        mPrefsMngr.setKeyValue(PreferencesManager.KEY_VALUE_ALARMS, mJSON.toString());
+    }
+
+    public AlarmModel getScheduledModel() {
+        long id = mPrefsMngr.getKeyValueLong(PreferencesManager.KEY_VALUE_ID);
+        return getModel(id);
+    }
+
+    public long getScheduledMillis() {
+        return mPrefsMngr.getKeyValueLong(PreferencesManager.KEY_VALUE_MILLIS);
     }
 }

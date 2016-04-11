@@ -4,14 +4,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.example.adam.nfcalarm.data.AlarmDAO;
-import com.example.adam.nfcalarm.data.AlarmDataManager;
 import com.example.adam.nfcalarm.model.AlarmModel;
 import com.example.adam.nfcalarm.ui.Alarms;
 import com.example.adam.nfcalarm.ui.Edit;
@@ -23,7 +19,6 @@ public class AlarmsActivity extends AppCompatActivity {
     // - change in longitude / latitude
     // - manually update timezone
     // - leap years
-    // - leap seconds
     // - day light savings time
 
     public static final String NAME = AlarmsActivity.class.getSimpleName();
@@ -107,7 +102,7 @@ public class AlarmsActivity extends AppCompatActivity {
 
     public void doAlarmsUpdate(JSONArray json) {
 //        AlarmDataManager.getInstance().updateAlarmsData(json);
-        mAlarmDAO.addModels(json);
+        mAlarmDAO.setModels(json);
     }
 
 /*    public void doScheduling(boolean scheduleAlarm) {

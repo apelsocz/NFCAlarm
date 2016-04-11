@@ -16,12 +16,12 @@
         <activity
             android:name=".MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".AlarmsActivity" />
+        <activity android:name=".AlarmsActivity"/>
 
         <receiver android:name=".scheduler.WakefulAlarmReceiver"/>
 
@@ -34,9 +34,9 @@
 
         <service android:name=".scheduler.SchedulingService"/>
 
-        <activity android:name=".RingingActivity" />
+        <activity android:name=".RingingActivity"/>
 
-        <service android:name=".scheduler.AlarmService" />
+        <service android:name=".scheduler.AlarmService"/>
 
     </application>
 

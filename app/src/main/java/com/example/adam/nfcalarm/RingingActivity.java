@@ -6,7 +6,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.example.adam.nfcalarm.data.AlarmDAO;
 import com.example.adam.nfcalarm.data.AlarmDataManager;
+import com.example.adam.nfcalarm.model.AlarmModel;
 import com.example.adam.nfcalarm.scheduler.AlarmService;
 import com.example.adam.nfcalarm.ui.Ringing;
 
@@ -39,13 +41,32 @@ public class RingingActivity extends AppCompatActivity {
 
     public void snooze() {
         MyApplication.getInstance().snooze();
+        //// TODO: 16-04-10 use broadcasts for snooze and dismiss
+//        ((Ringing)getSupportFragmentManager().findFragmentByTag(Ringing.NAME)).snooze();
         stopRinging();
+        finish();
     }
 
     public void dismiss() {
-        AlarmDataManager alarmDataManager = AlarmDataManager.getInstance();
-        long id = alarmDataManager.getNextAlarmID();
-        alarmDataManager.doAlarmDismissed(id);
+//        AlarmDataManager alarmDataManager = AlarmDataManager.getInstance();
+//        long id = alarmDataManager.getNextAlarmID();
+//        alarmDataManager.doAlarmDismissed(id);
+
+        ((Ringing)getSupportFragmentManager().findFragmentByTag(Ringing.NAME)).dismiss();
+
+        AlarmDAO alarmDAO = new AlarmDAO();
+        AlarmModel model = alarmDAO.getScheduledModel();
+
+        if (model.once) {
+            model = new AlarmModel(model.uniqueID, !model.isActive, model.hour, model.minute,
+                    model.once, model.sunday, model.monday, model.tuesday, model.wednesday,
+                    model.thursday, model.friday, model.saturday);
+        }
+
+        alarmDAO.updateModel(model);
+
+        stopRinging();
+        finish();
     }
 
     public void stopRinging() {

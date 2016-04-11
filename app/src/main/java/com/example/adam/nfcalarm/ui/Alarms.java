@@ -114,9 +114,8 @@ public class Alarms extends Fragment {
 
     public void toggleAlarm(AlarmModel model) {
         Log.d("Launched", "toggleAlarm()");
-
-            alarmDAO.updateModel(model);
-            mRecycler.swapAdapter( new Adapter(getActivity(), alarmDAO.getModelsAsList()), false );
+        alarmDAO.updateModel(model);
+        mRecycler.swapAdapter( new Adapter(getActivity(), alarmDAO.getModelsAsList()), false );
     }
 /*
     private static final class CellViewHolder extends ViewHolder implements View.OnClickListener {
