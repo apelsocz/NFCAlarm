@@ -69,6 +69,8 @@ public class AlarmDAO implements DAOInterface {
         write();
     }
 
+
+
     @Override
     public void updateModel(AlarmModel model) {
         List<AlarmModel> list = mList;
@@ -134,12 +136,12 @@ public class AlarmDAO implements DAOInterface {
         mPrefsMngr.setKeyValue(PreferencesManager.KEY_VALUE_ALARMS, mJSON.toString());
     }
 
-    public AlarmModel getScheduledModel() {
+    public AlarmModel scheduledModel() {
         long id = mPrefsMngr.getKeyValueLong(PreferencesManager.KEY_VALUE_ID);
         return getModel(id);
     }
 
-    public long getScheduledMillis() {
+    public long scheduledMillis() {
         return mPrefsMngr.getKeyValueLong(PreferencesManager.KEY_VALUE_MILLIS);
     }
 }

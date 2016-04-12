@@ -25,6 +25,7 @@ public class SchedulingService extends IntentService {
 
         Intent activityIntent = new Intent(getApplicationContext(), RingingActivity.class);
         activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         getApplication().startActivity(activityIntent);
 
         // Release the wake lock provided by the BroadcastReceiver.

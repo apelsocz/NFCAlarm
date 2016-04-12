@@ -53,7 +53,7 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
 
 //        long millis = AlarmDataManager.getInstance().getNextAlarmMillis();
         mAlarmDAO = new AlarmDAO();
-        long millis = mAlarmDAO.getScheduledMillis();
+        long millis = mAlarmDAO.scheduledMillis();
 
         // for development purposes only
         Calendar calendar = Calendar.getInstance();
@@ -102,9 +102,11 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.SECOND, 10);
+        calendar.add(Calendar.SECOND, 5);
         Date date = calendar.getTime();
         Log.d("WakefulAlarmReceiver", "snooze()");
         alarmMgr.setExact(AlarmManager.RTC_WAKEUP, date.getTime(), alarmIntent);
+
+        //// TODO: 16-04-11 add component calls disallow user from shutting off device and back on
     }
 }

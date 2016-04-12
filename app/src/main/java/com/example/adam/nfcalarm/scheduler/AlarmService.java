@@ -14,7 +14,7 @@ import android.support.v4.app.NotificationCompat;
 import com.example.adam.nfcalarm.RingingActivity;
 import com.example.adam.nfcalarm.R;
 import com.example.adam.nfcalarm.data.AlarmDAO;
-import com.example.adam.nfcalarm.data.AlarmDataManager;
+
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
@@ -71,7 +71,7 @@ public class AlarmService extends Service implements MediaPlayer.OnPreparedListe
     private void showNotification() {
 
         AlarmDAO alarmDAO = new AlarmDAO();
-        long millis = alarmDAO.getScheduledMillis();
+        long millis = alarmDAO.scheduledMillis();
 //        try {
 //            millis = AlarmDataManager.getInstance().getNextAlarmMillis();
 //        } catch (IllegalStateException e) {

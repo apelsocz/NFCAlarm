@@ -6,22 +6,33 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
 
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/icon_nfc"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:name=".MyApplication">
+        android:name=".MyApplication"
+        android:taskAffinity="@string/task_affinity">
         
         <activity
-            android:name=".MainActivity">
+            android:name=".MainActivity"
+            android:taskAffinity="@string/task_affinity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".AlarmsActivity"/>
+        <activity android:name=".AlarmsActivity"
+            android:taskAffinity="@string/task_affinity" />
+
+        <activity android:name=".RingingActivity"
+            android:taskAffinity="@string/task_affinity"
+            android:noHistory="true"
+            android:clearTaskOnLaunch="true">
+        </activity>
+
 
         <receiver android:name=".scheduler.WakefulAlarmReceiver"/>
 
@@ -32,9 +43,8 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".scheduler.SchedulingService"/>
 
-        <activity android:name=".RingingActivity"/>
+        <service android:name=".scheduler.SchedulingService"/>
 
         <service android:name=".scheduler.AlarmService"/>
 
