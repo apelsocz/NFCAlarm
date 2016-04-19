@@ -7,8 +7,11 @@ import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.example.adam.nfcalarm.data.AlarmDAO;
 import com.example.adam.nfcalarm.model.AlarmModel;
@@ -26,36 +29,53 @@ public class RingingActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        MyApplication.getInstance().setRinging(true);
+        MyApplication.getInstance().isRinging = true;
         setContentView(R.layout.activity_alarm);
-        String action = getIntent().getAction();
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
-        if (action != null) {
-            Log.d("RingingActivity", "onCreate(" + action + ")");
-            if (action.equals(ACTION_SNOOZE_ALARM)) {
-                snooze();
-            }
-            if (action.equals(ACTION_DISMISS_ALARM)) {
-                dismiss();
-            }
-        }
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.alarmContainer, new Ringing(), Ringing.NAME)
                     .commit();
         }
+        else {
+            Log.d("RingingActivity", "onCreate(savedinstance not null)");
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (!mNfcAdapter.isEnabled()) {
+            Snackbar.make(findViewById(R.id.alarmContainer), "Near Field Communication is OFF", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("ENABLE", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                        }
+                    }).show();
+        }
+
         /**
          * It's important, that the activity is in the foreground.
          * Otherwise an IllegalStateException is thrown.
          */
         setupForegroundDispatch(this, mNfcAdapter);
+
+        String action = getIntent().getAction();
+        if (action != null) {
+            Log.d("RingingActivity", "onCreate(" + action + ")");
+            if (action.equals(ACTION_SNOOZE_ALARM)) {
+                snooze();
+            }
+            if (action.equals(NfcAdapter.ACTION_TAG_DISCOVERED) ||
+                    action.equals(NfcAdapter.ACTION_TECH_DISCOVERED)) {
+//                dismiss();
+                dismiss();
+            }
+        }
     }
 
     @Override
@@ -67,28 +87,13 @@ public class RingingActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        /*
-         *  This method gets called, when the user attaches a Tag to the device.
-         */
-        String action = intent.getAction();
-        if (action.equals(NfcAdapter.ACTION_TAG_DISCOVERED) ||
-                action.equals(NfcAdapter.ACTION_TECH_DISCOVERED)) {
-            dismiss();
-        }
-        Log.d("RingingActivity", intent.getAction());
-    }
-
     public void snooze() {
         MyApplication.getInstance().snooze();
         stopRinging();
-        finish();
+        finishAffinity();
     }
 
     public void dismiss() {
-        ((Ringing)getSupportFragmentManager().findFragmentByTag(Ringing.NAME)).dismiss();
-        MyApplication.getInstance().dismiss();
 
         AlarmDAO alarmDAO = new AlarmDAO();
         AlarmModel model = alarmDAO.scheduledModel();
@@ -97,12 +102,12 @@ public class RingingActivity extends AppCompatActivity {
             model = new AlarmModel(model.uniqueID, !model.isActive, model.hour, model.minute,
                     model.once, model.sunday, model.monday, model.tuesday, model.wednesday,
                     model.thursday, model.friday, model.saturday);
-
         }
 
         alarmDAO.updateModel(model);
         stopRinging();
-        finish();
+        MyApplication.getInstance().dismiss();
+        finishAffinity();
     }
 
     public void stopRinging() {

@@ -29,7 +29,7 @@
         app:layout_anchor="@id/alarmContainer"
         app:layout_anchorGravity="center_horizontal|center_vertical"
         app:fabSize="normal"
-        app:elevation="@dimen/fab_elevation"
+        app:elevation="@dimen/design_fab_elevation"
         app:borderWidth="0dp" />
 
 </android.support.design.widget.CoordinatorLayout>

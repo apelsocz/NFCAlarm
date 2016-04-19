@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="600dp" >
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
+        <ImageView
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:src="@drawable/ic_search_white_48dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"/>
         <TextView
             android:id="@+id/alarms_empty_title"
             android:fontFamily="sans-serif-regular"
@@ -13,11 +20,5 @@
             android:focusable="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
-        <ImageView
-            android:layout_width="128dp"
-            android:layout_height="128dp"
-            android:src="@drawable/ic_search_white_48dp"
-            android:layout_above="@id/alarms_empty_title"
-            android:layout_centerHorizontal="true" />
-</RelativeLayout>
+            android:layout_gravity="center"/>
+</LinearLayout>

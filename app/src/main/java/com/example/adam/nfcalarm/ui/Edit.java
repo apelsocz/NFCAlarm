@@ -31,9 +31,6 @@ import org.json.JSONException;
 
 import java.util.Calendar;
 
-/**
- * Created by adam on 15-12-30.
- */
 public class Edit extends Fragment implements View.OnClickListener {
     public static final String NAME = Edit.class.getSimpleName();
 
@@ -109,7 +106,6 @@ public class Edit extends Fragment implements View.OnClickListener {
 
         setHasOptionsMenu(true);
 
-//        alarmManager = AlarmDataManager.getInstance();
         mAlarmDAO = new AlarmDAO();
 
         // retrieve the model being edited, either in savedinstance or the fragments bundle
@@ -141,9 +137,9 @@ public class Edit extends Fragment implements View.OnClickListener {
         inflater.inflate(R.menu.edit, menu);
 
         // hide settings menu item
-        final MenuItem settingsMenuItem = menu.findItem(R.id.action_settings);
-        if (settingsMenuItem != null) {
-            settingsMenuItem.setVisible(false);
+        final MenuItem settings = menu.findItem(R.id.action_settings);
+        if (settings != null) {
+            settings.setVisible(false);
         }
 
         super.onCreateOptionsMenu(menu, inflater);
@@ -166,7 +162,6 @@ public class Edit extends Fragment implements View.OnClickListener {
         switch (item.getItemId()) {
             case R.id.save:
                 if (!currentModel.isEmpty) {
-                    //// TODO: 16-01-20 remove try catch
                     try{
                         if (savedModelIndex > -1) {
                             alarms.put(savedModelIndex, currentModel.json);
@@ -214,8 +209,6 @@ public class Edit extends Fragment implements View.OnClickListener {
     }
 
     private void updateUI(AlarmModel model)  {
-        //TODO
-        // conversions. find out if this is where.
         if (model != null && !model.isEmpty) {
             isActive.setChecked(model.isActive);
             picker.setHour(Integer.parseInt(model.hour));
@@ -231,14 +224,8 @@ public class Edit extends Fragment implements View.OnClickListener {
         }
         else {
             isActive.setChecked(false);
-            // TODO take steps for picker being shown as 24 hour / if 12 hour AM PM should be set
-            /*picker.setHour((Calendar.getInstance())
-                    .get(DateFormat.is24HourFormat(getActivity()) ? Calendar.HOUR_OF_DAY : Calendar.HOUR
-            ));*/
-            picker.setHour((Calendar.getInstance())
-                    .get(DateFormat.is24HourFormat(getActivity()) ? Calendar.HOUR_OF_DAY : Calendar.HOUR
-                    ));
-            picker.setMinute(((Calendar.getInstance()).get(Calendar.MINUTE)));
+            picker.setHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+            picker.setMinute((Calendar.getInstance()).get(Calendar.MINUTE));
             once.setChecked(true);
             sunday.setChecked(false);
             monday.setChecked(false);

@@ -34,7 +34,8 @@
         <activity android:name=".RingingActivity"
             android:taskAffinity="@string/task_affinity"
             android:noHistory="true"
-            android:clearTaskOnLaunch="true">
+            android:clearTaskOnLaunch="true"
+            android:excludeFromRecents="true">
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED"/>
             </intent-filter>

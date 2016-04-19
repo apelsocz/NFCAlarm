@@ -16,10 +16,6 @@
         android:id="@+id/fragmentContainer">
         <!--android:background="@color/primaryColorLight"-->
     </FrameLayout>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginTop="@dimen/abc_action_bar_default_height_material" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floating_action_btn"
@@ -28,10 +24,10 @@
         android:layout_margin="16dp"
         android:clickable="true"
         android:src="@drawable/ic_alarm_add_white_48dp"
-        app:layout_anchor="@id/fragmentContainer"
+        app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|right"
         app:fabSize="normal"
-        app:elevation="@dimen/fab_elevation"
+        app:elevation="@dimen/design_fab_elevation"
         app:borderWidth="0dp" />
 
 </android.support.design.widget.CoordinatorLayout>

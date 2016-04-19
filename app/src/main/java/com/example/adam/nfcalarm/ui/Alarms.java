@@ -1,22 +1,17 @@
 package com.example.adam.nfcalarm.ui;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.adam.nfcalarm.AlarmsActivity;
@@ -25,10 +20,10 @@ import com.example.adam.nfcalarm.data.AlarmDAO;
 import com.example.adam.nfcalarm.data.AlarmDataManager;
 //import com.example.adam.nfcalarm.model.AlarmData;
 import com.example.adam.nfcalarm.model.AlarmModel;
+import com.example.adam.nfcalarm.util.Data;
+import com.example.adam.nfcalarm.util.Format;
 import com.example.adam.nfcalarm.util.Views;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Alarms extends Fragment {
@@ -38,8 +33,10 @@ public class Alarms extends Fragment {
     private Adapter mAdapter;
     private FloatingActionButton mFAB;
     private AlarmDataManager alarmManager;
-    private AlarmDAO alarmDAO;
+    private AlarmDAO mAlarmDAO;
     private List<AlarmModel> mList;
+    private TextView mNextDate;
+    private TextView mNextTime;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,15 +55,16 @@ public class Alarms extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//        alarmManager = AlarmDataManager.getInstance();
+        mNextDate = (TextView) view.findViewById(R.id.ac_next_date);
+        mNextTime = (TextView) view.findViewById(R.id.ac_next_time);
+
         update();
         mAdapter = new Adapter(getActivity(), mList);
-        mRecycler = (RecyclerView) view;
+        mRecycler = (RecyclerView) view.findViewById(R.id.alarm_container_recycler);
         mRecycler.setHasFixedSize(false);
         mRecycler.setAdapter(mAdapter);
         mRecycler.setLayoutManager( new LinearLayoutManager(
-                getActivity(), LinearLayoutManager.VERTICAL, false)
-        );
+                getActivity(), LinearLayoutManager.VERTICAL, false));
         mRecycler.setItemAnimator( new DefaultItemAnimator() );
 
         setHasOptionsMenu(true);
@@ -90,32 +88,42 @@ public class Alarms extends Fragment {
     }
 
     public void update() {
-        Activity activity = getActivity();
-        alarmDAO = new AlarmDAO();
+        mAlarmDAO = new AlarmDAO();
 
-        if (!Views.isActivityNull(activity)) {
-//            mList = new ArrayList<>();
-            mList = alarmDAO.getModelsAsList();
-            Log.d(NAME, "update(), modelList.size:" + String.valueOf(mList.size()));
+        mList = mAlarmDAO.getModelsAsList();
+        Log.d(NAME, "update(), modelList.size:" + String.valueOf(mList.size()));
 
-            if (mList.size() == 0) {
-                //no data - add 'null' to fetch R.layout.alarms_empty_cell
-//                modelList.add(AlarmModel.EMPTY);
-                mList.add(AlarmModel.EMPTY);
-            }
+        if (mList.size() == 0) {
+            //no data - add 'null' to fetch R.layout.alarms_empty_cell
+            mList.add(AlarmModel.EMPTY);
         }
 
         if (mRecycler != null) {
-//            mRecycler.requestLayout();
             mAdapter = new Adapter(getActivity(), mList);
             mRecycler.swapAdapter(mAdapter, false);
+        }
+
+        updateNext();
+    }
+
+    private void updateNext(){
+        if (!Data.activeModelInList(mList)) {
+            mNextDate.setText("Nothing Scheduled");
+
+            mNextTime.setText("");
+        }
+        else {
+            long millis = mAlarmDAO.scheduledMillis();
+            mNextDate.setText(Format.formatDate(millis));
+            mNextTime.setText(Format.formatTime(millis));
         }
     }
 
     public void toggleAlarm(AlarmModel model) {
         Log.d("Launched", "toggleAlarm()");
-        alarmDAO.updateModel(model);
-        mRecycler.swapAdapter( new Adapter(getActivity(), alarmDAO.getModelsAsList()), false );
+        mAlarmDAO.updateModel(model);
+        mRecycler.swapAdapter( new Adapter(getActivity(), mAlarmDAO.getModelsAsList()), false );
+        updateNext();
     }
 /*
     private static final class CellViewHolder extends ViewHolder implements View.OnClickListener {

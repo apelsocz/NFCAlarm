@@ -17,26 +17,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.d("MainActivity", "onCreate()");
 
-        Intent intent = getIntent();
-
-        boolean isRinging = MyApplication.getInstance().getRinging();
-        boolean isSnoozed = MyApplication.getInstance().getSnoozing();
+        boolean isRinging = MyApplication.getInstance().isRinging;
+        boolean isSnoozed = MyApplication.getInstance().isSnoozing;
 
         if (isRinging || isSnoozed) {
             Intent activity = new Intent(getApplicationContext(), RingingActivity.class);
-//            if (intent != null) {
-//                String action = intent.getAction();
-//                if (action.equals(NfcAdapter.ACTION_TAG_DISCOVERED) ||
-//                        action.equals(NfcAdapter.ACTION_TECH_DISCOVERED)) {
-//                    activity.setAction(RingingActivity.ACTION_DISMISS_ALARM);
-//                }
-//            }
             if (isSnoozed) {
                 Context context = getApplicationContext();
-                Intent mpIntent = new Intent(context, AlarmService.class);
-                mpIntent.setAction(AlarmService.ACTION_PLAY);
-                context.startService(mpIntent);
+                Intent media = new Intent(context, AlarmService.class);
+                media.setAction(AlarmService.ACTION_PLAY);
+
+                context.startService(media);
                 MyApplication.getInstance().setSnoozing(false);
+                MyApplication.getInstance().doScheduling(false);
             }
             startActivity(activity);
         }

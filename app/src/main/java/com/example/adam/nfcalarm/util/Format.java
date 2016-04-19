@@ -1,6 +1,8 @@
 package com.example.adam.nfcalarm.util;
 
+import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class Format {
     public static String dayOfYear(int dayOfWeek) {
@@ -28,5 +30,17 @@ public class Format {
             day = "saturday";
         }
         return day;
+    }
+
+    public static String formatDate(long millis) {
+        final DateFormat df = DateFormat.getDateInstance(DateFormat.FULL);
+        Date date = new Date(millis);
+        return df.format(date);
+    }
+
+    public static String formatTime(long millis) {
+        final DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT);
+        Date date = new Date(millis);
+        return tf.format(date);
     }
 }

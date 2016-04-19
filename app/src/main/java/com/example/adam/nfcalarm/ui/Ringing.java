@@ -21,12 +21,13 @@ import android.widget.TextView;
 
 import com.example.adam.nfcalarm.RingingActivity;
 import com.example.adam.nfcalarm.R;
+import com.example.adam.nfcalarm.util.Format;
 
 import java.text.DateFormat;
 import java.util.Calendar;
 
 public class Ringing extends Fragment {
-    public static final String NAME = Ringing.class.getName();
+    public static final String NAME = Ringing.class.getSimpleName();
 
     private TextView mTime;
     private TextView mDate;
@@ -56,7 +57,7 @@ public class Ringing extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.alarm_display, container, false);
+        View rootView = inflater.inflate(R.layout.alarm_ringing, container, false);
 
         mTime = (TextView) rootView.findViewById(R.id.display_time);
         mDate = (TextView) rootView.findViewById(R.id.display_date);
@@ -86,7 +87,7 @@ public class Ringing extends Fragment {
 
     @Override
     public void onResume() {
-        Log.d("display", "onResume()");
+        Log.d(NAME, "onResume()");
         super.onResume();
         update();
         getActivity().registerReceiver(mTimeTickReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
@@ -94,17 +95,19 @@ public class Ringing extends Fragment {
 
     @Override
     public void onPause() {
-        Log.d("display", "onPause()");
+        Log.d(NAME, "onPause()");
         getActivity().unregisterReceiver(mTimeTickReceiver);
         super.onPause();
     }
 
     private void update() {
-        final DateFormat df = DateFormat.getDateInstance(DateFormat.FULL);
-        final DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT);
-
-        mDate.setText(df.format(Calendar.getInstance().getTime()));
-        mTime.setText(tf.format(Calendar.getInstance().getTime()));
+//        final DateFormat df = DateFormat.getDateInstance(DateFormat.FULL);
+//        final DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT);
+//
+//        mDate.setText(df.format(Calendar.getInstance().getTime()));
+//        mTime.setText(tf.format(Calendar.getInstance().getTime()));
+        mDate.setText(Format.formatDate(Calendar.getInstance().getTimeInMillis()));
+        mTime.setText(Format.formatTime(Calendar.getInstance().getTimeInMillis()));
     }
 
     public void snooze() {

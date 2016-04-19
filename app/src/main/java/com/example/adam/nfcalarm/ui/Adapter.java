@@ -14,7 +14,10 @@ import android.widget.TextView;
 import com.example.adam.nfcalarm.AlarmsActivity;
 import com.example.adam.nfcalarm.R;
 import com.example.adam.nfcalarm.model.AlarmModel;
+import com.example.adam.nfcalarm.util.Format;
 import com.example.adam.nfcalarm.util.Views;
+
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,7 +30,7 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
     private static final class CellViewHolder extends ViewHolder implements View.OnClickListener {
 
         private final TextView time;
-        private final TextView repeat;
+        private final TextView schedule;
         private final ImageView icon;
         private final Switch isActive;
 
@@ -36,7 +39,7 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
         private CellViewHolder(View view) {
             super(view);
             time = (TextView) view.findViewById(R.id.alarms_time);
-            repeat = (TextView) view.findViewById(R.id.alarms_repeat);
+            schedule = (TextView) view.findViewById(R.id.alarms_repeat);
             icon = (ImageView) view.findViewById(R.id.alarms_icon);
             isActive = (Switch) view.findViewById(R.id.alarms_active);
         }
@@ -45,21 +48,16 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
             if (model == null || model.isEmpty) {
                 return;
             }
-            this.model = model;
 
+            this.model = model;
             itemView.setOnClickListener(this);
 
-            time.setText(model.hour + ":" + model.minute);
-/*            if (DateFormat.is24HourFormat(context)) {
-                time.setText(model.hour + ":" + model.minute);
-            }
-            else {
-                //// TODO: 16-01-03
-                ////    update this area to format per user locale
-                int hour = Integer.parseInt(this.model.hour);
-                hour = hour > 12 ? hour - 12 : hour;
-                time.setText(hour +":"+ model.minute);
-            }*/
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(0L);
+            calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(model.hour));
+            calendar.set(Calendar.MINUTE, Integer.valueOf(model.minute));
+
+            time.setText(Format.formatTime(calendar.getTimeInMillis()));
 
             String days = "";
             if (model.sunday && model.monday && model.tuesday && model.wednesday
@@ -106,7 +104,7 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
                     }
                 }
             }
-            repeat.setText(days);
+            schedule.setText(days);
 
             Context context = itemView.getContext();
             int id = model.isActive ? R.drawable.ic_alarm_on_white_48dp :

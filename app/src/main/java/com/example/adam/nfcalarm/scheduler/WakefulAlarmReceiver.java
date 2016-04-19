@@ -58,7 +58,7 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
         // for development purposes only
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.SECOND, 5);
+        calendar.add(Calendar.SECOND, 10);
         Date date = calendar.getTime();
         Log.d("WakefulAlarmReceiver", date.toString());
         alarmMgr.setExact(AlarmManager.RTC_WAKEUP, date.getTime(), alarmIntent);
@@ -102,7 +102,7 @@ public class WakefulAlarmReceiver extends WakefulBroadcastReceiver {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.SECOND, 5);
+        calendar.add(Calendar.SECOND, 10);
         Date date = calendar.getTime();
         Log.d("WakefulAlarmReceiver", "snooze()");
         alarmMgr.setExact(AlarmManager.RTC_WAKEUP, date.getTime(), alarmIntent);

@@ -13,8 +13,8 @@ public class MyApplication extends Application {
     private static MyApplication mInstance;
     private WakefulAlarmReceiver alarmReceiver = new WakefulAlarmReceiver();
     private AlarmDAO mAlarmDAO;
-    private boolean isRinging = false;
-    private boolean isSnoozing = false;
+    public boolean isRinging = false;
+    public boolean isSnoozing = false;
 
     public static MyApplication getInstance() {
         return mInstance;
@@ -48,24 +48,11 @@ public class MyApplication extends Application {
         isSnoozing = true;
     }
 
-    public void dismiss() {
-        isRinging = false;
-
-    }
-
-    public boolean getRinging() {
-        return isRinging;
-    }
-
-    public void setRinging(boolean isRinging) {
-        this.isRinging = isRinging;
-    }
-
-    public boolean getSnoozing() {
-        return isSnoozing;
-    }
-
     public void setSnoozing(boolean isRinging) {
         this.isSnoozing = isRinging;
+    }
+
+    public void dismiss() {
+        isRinging = false;
     }
 }
