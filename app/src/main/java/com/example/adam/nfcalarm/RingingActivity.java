@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -53,7 +54,7 @@ public class RingingActivity extends AppCompatActivity {
                     .setAction("ENABLE", new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-
+                            startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
                         }
                     }).show();
         }
