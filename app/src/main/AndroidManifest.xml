@@ -55,6 +55,13 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+        
+        <receiver android:name=".scheduler.NfcStateReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.nfc.action.ADAPTER_STATE_CHANGED"/>
+            </intent-filter>
+        </receiver>
 
 
         <service android:name=".scheduler.SchedulingService"/>

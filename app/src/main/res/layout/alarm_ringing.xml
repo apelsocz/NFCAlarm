@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/display_background"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        android:background="@drawable/radial_background"/>
 
     <RelativeLayout
         android:layout_width="match_parent"

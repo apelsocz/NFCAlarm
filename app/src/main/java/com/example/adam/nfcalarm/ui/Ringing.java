@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.example.adam.nfcalarm.RingingActivity;
 import com.example.adam.nfcalarm.R;
 import com.example.adam.nfcalarm.util.Format;
+import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -101,11 +102,6 @@ public class Ringing extends Fragment {
     }
 
     private void update() {
-//        final DateFormat df = DateFormat.getDateInstance(DateFormat.FULL);
-//        final DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT);
-//
-//        mDate.setText(df.format(Calendar.getInstance().getTime()));
-//        mTime.setText(tf.format(Calendar.getInstance().getTime()));
         mDate.setText(Format.formatDate(Calendar.getInstance().getTimeInMillis()));
         mTime.setText(Format.formatTime(Calendar.getInstance().getTimeInMillis()));
     }

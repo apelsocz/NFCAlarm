@@ -1,17 +1,17 @@
 package com.example.adam.nfcalarm;
 
 import android.app.Application;
-import android.content.res.Configuration;
 
 import com.example.adam.nfcalarm.data.AlarmDAO;
-import com.example.adam.nfcalarm.data.AlarmDataManager;
+import com.example.adam.nfcalarm.scheduler.NfcStateReceiver;
 import com.example.adam.nfcalarm.scheduler.WakefulAlarmReceiver;
 
 
 public class MyApplication extends Application {
 
     private static MyApplication mInstance;
-    private WakefulAlarmReceiver alarmReceiver = new WakefulAlarmReceiver();
+    private WakefulAlarmReceiver mAlarmReceiver = new WakefulAlarmReceiver();
+    private NfcStateReceiver mNfcState = new NfcStateReceiver();
     private AlarmDAO mAlarmDAO;
     public boolean isRinging = false;
     public boolean isSnoozing = false;
@@ -36,15 +36,19 @@ public class MyApplication extends Application {
 
     public void doScheduling(boolean schedule) {
         if (schedule) {
-            alarmReceiver.setAlarm(this);
+            mAlarmReceiver.setAlarm(this);
         }
         else if (!schedule) {
-            alarmReceiver.cancelAlarm(this);
+            mAlarmReceiver.cancelAlarm(this);
         }
     }
 
+    public void setmNfcStateReceiver(boolean enabled) {
+        mNfcState.setEnabled(this, enabled);
+    }
+
     public void snooze() {
-        alarmReceiver.snooze(this);
+        mAlarmReceiver.snooze(this);
         isSnoozing = true;
     }
 

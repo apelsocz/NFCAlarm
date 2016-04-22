@@ -4,16 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-/**
- * Created by adam on 16-01-17.
- */
 public class AlarmBootReceiver extends BroadcastReceiver {
-    WakefulAlarmReceiver alarm = new WakefulAlarmReceiver();
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-//            alarm.setAlarm(context);
+            //// TODO: 16-04-21 complete this
         }
     }
 }

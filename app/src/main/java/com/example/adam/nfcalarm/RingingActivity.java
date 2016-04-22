@@ -2,8 +2,11 @@ package com.example.adam.nfcalarm;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -49,22 +52,6 @@ public class RingingActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (!mNfcAdapter.isEnabled()) {
-            Snackbar.make(findViewById(R.id.alarmContainer), "Near Field Communication is OFF", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("ENABLE", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
-                        }
-                    }).show();
-        }
-
-        /**
-         * It's important, that the activity is in the foreground.
-         * Otherwise an IllegalStateException is thrown.
-         */
-        setupForegroundDispatch(this, mNfcAdapter);
-
         String action = getIntent().getAction();
         if (action != null) {
             Log.d("RingingActivity", "onCreate(" + action + ")");
@@ -73,10 +60,33 @@ public class RingingActivity extends AppCompatActivity {
             }
             if (action.equals(NfcAdapter.ACTION_TAG_DISCOVERED) ||
                     action.equals(NfcAdapter.ACTION_TECH_DISCOVERED)) {
-//                dismiss();
                 dismiss();
             }
         }
+
+        if (!mNfcAdapter.isEnabled()) {
+            MyApplication.getInstance().setmNfcStateReceiver(true);
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.alarmContainer),
+                    "Near Field Communication is OFF", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("ENABLE", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
+                        }
+                    });
+            snackbar.getView().setBackgroundColor(Color.parseColor("#212121"));
+            snackbar.show();
+
+        }
+        else {
+            MyApplication.getInstance().setmNfcStateReceiver(false);
+        }
+
+        /**
+         * It's important, that the activity is in the foreground.
+         * Otherwise an IllegalStateException is thrown.
+         */
+        setupForegroundDispatch(this, mNfcAdapter);
     }
 
     @Override
@@ -85,11 +95,18 @@ public class RingingActivity extends AppCompatActivity {
          * Call this before onPause, otherwise an IllegalArgumentException is thrown.
          */
         stopForegroundDispatch(this, mNfcAdapter);
+
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     public void snooze() {
         MyApplication.getInstance().snooze();
+        MyApplication.getInstance().setmNfcStateReceiver(false);
         stopRinging();
         finishAffinity();
     }
