@@ -1,6 +1,7 @@
 package com.example.adam.nfcalarm.ui;
 
 import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -106,10 +107,14 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
             }
             schedule.setText(days);
 
-            Context context = itemView.getContext();
-            int id = model.isActive ? R.drawable.ic_alarm_on_white_48dp :
-                    R.drawable.ic_alarm_off_white_48dp;
-            icon.setImageDrawable(ContextCompat.getDrawable(context, id));
+//            Context context = itemView.getContext();
+//            int id = model.isActive ? R.drawable.ic_alarm_on_white_48dp :
+//                    R.drawable.ic_alarm_off_white_48dp;
+//            icon.setImageDrawable(ContextCompat.getDrawable(context, id));
+
+            icon.setBackgroundResource(R.drawable.alarm_cell_icon);
+            AnimationDrawable anim = (AnimationDrawable) icon.getBackground();
+            anim.start();
 
             isActive.setChecked(model.isActive);
             isActive.setOnClickListener(this);
@@ -142,11 +147,27 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
         itemsSize = this.items.size();
     }
 
-    @Override
+/*    @Override
     public int getItemViewType(int position) {
         // if model is null and only one item, we treat this one as no data - will be used
         // to load R.layout.contacts_empty_cell. Otherwise regular layout
         //// TODO: 16-04-05 investigate cause of data showing up
+        AlarmModel model = items.get(position);
+//            return itemsSize == 1 && model.isEmpty ? R.layout.alarms_empty_cell : R.layout.alarms_cell;
+        boolean retBoolean = model.isEmpty;
+        int vtype = model.isEmpty ? R.layout.alarms_empty_cell : R.layout.alarms_cell;
+
+        int alarmsCell = R.layout.alarms_cell;
+        int emptyCell = R.layout.alarms_empty_cell;
+
+//            return model.isEmpty ? R.layout.alarms_empty_cell : R.layout.alarms_cell;
+        return vtype;
+    }*/
+
+    @Override
+    public int getItemViewType(int position) {
+        // if model is null and only one item, we treat this one as no data - will be used
+        // to load R.layout.contacts_empty_cell. Otherwise regular layout
         AlarmModel model = items.get(position);
 //            return itemsSize == 1 && model.isEmpty ? R.layout.alarms_empty_cell : R.layout.alarms_cell;
         boolean retBoolean = model.isEmpty;

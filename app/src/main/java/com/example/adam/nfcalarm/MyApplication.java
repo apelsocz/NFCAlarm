@@ -43,7 +43,7 @@ public class MyApplication extends Application {
         }
     }
 
-    public void setmNfcStateReceiver(boolean enabled) {
+    public void enableNfcStateReceiver(boolean enabled) {
         mNfcState.setEnabled(this, enabled);
     }
 

@@ -2,6 +2,7 @@ package com.example.adam.nfcalarm.data;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import com.example.adam.nfcalarm.MyApplication;
 import com.example.adam.nfcalarm.model.AlarmModel;
@@ -67,6 +68,7 @@ public class AlarmDAO implements DAOInterface {
     @Override
     public void setModels(JSONArray json) {
         mJSON = json;
+        mList = Data.modelsAsList(json);
         write();
     }
 
@@ -116,7 +118,7 @@ public class AlarmDAO implements DAOInterface {
     }
 
     private void findNextAlarm(List<AlarmModel> alarmList) {
-        long nextModelID = 0L;
+        long idNext = 0L;
         Calendar calNext = Calendar.getInstance();
         Calendar calNow = Calendar.getInstance();
         Calendar calModel = Calendar.getInstance();
@@ -129,110 +131,130 @@ public class AlarmDAO implements DAOInterface {
         Date dateNow = calNow.getTime();
         Date dateModel;
 
-        Log.d("[START] now", dateNow.toString());
-        Log.d("[START] next", String.valueOf(dateNext.getTime()));
-        Log.d("[START] next", dateNext.toString());
-
         if (alarmList.size() > 0) {
             if (Data.activeModelInList(alarmList) ) {
                 for (AlarmModel model : alarmList) {
                     if (model.isActive) {
-                        String tag = String.valueOf(model.uniqueID) + ", [" +
-                                model.hour + ":" + model.minute + "]";
-                        Log.d(tag, "<- isActive");
+                        // reset model Calendar
                         calModel.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR));
                         calModel.set(Calendar.HOUR_OF_DAY, 0);
                         calModel.set(Calendar.MINUTE, 0);
-                        // allow for 5 seconds to be flexible
                         calModel.set(Calendar.SECOND, 5);
+                        // recompute Calendar
                         dateModel = calModel.getTime();
-                        Log.d(tag, "<- refreshed (" + dateModel.toString() + ")");
+
+                        // initialize Calendar and Date to model values
                         int hourOfDay = Integer.parseInt(model.hour);
                         int minute = Integer.parseInt(model.minute);
-                        Log.d(tag, String.valueOf(hourOfDay) + ":" + String.valueOf(minute));
                         calModel.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         calModel.set(Calendar.MINUTE, minute);
-
                         dateModel = calModel.getTime();
-                        Log.d(tag, "<- add (" + dateModel.toString() + ")");
 
                         if (model.once) {
-                            Log.d(tag, "model.once");
                             if (dateModel.before(dateNow)) {
                                 calModel.add(Calendar.DAY_OF_YEAR, 1);
                                 dateModel = calModel.getTime();
                             }
                         }
                         else {
-                            Log.d(tag, "model.repeats");
-                            // iterate, until first occurence of:
-                            // dateModel being active after dateNow
+                            // amount of days to increment
                             int i = 0;
                             boolean iterate = true;
+
                             do {
-                                Log.d(tag, "Iteration [" + String.valueOf(i) + "]");
                                 // refresh model calendar to today and increment by i
-                                calModel.set(Calendar.DAY_OF_YEAR, calNow.get(
-                                        Calendar.DAY_OF_YEAR));
+                                calModel.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR));
                                 calModel.add(Calendar.DAY_OF_YEAR, i);
                                 dateModel = calModel.getTime();
 
-                                if (Data.isDayActive(calModel.get(Calendar.DAY_OF_WEEK),
-                                        model)) {
-                                    Log.d(tag, "> "
-                                            + Format.dayOfYear(calModel.get(Calendar.DAY_OF_WEEK)) +
-                                            " " + String.valueOf(calModel.get(Calendar.DAY_OF_YEAR))
-                                            + ", repeat: true"
-                                    );
-                                    // check if model is after now
+                                if (Data.isDayActive(calModel.get(Calendar.DAY_OF_WEEK), model)) {
                                     if (dateModel.after(dateNow)) {
+                                        // loop until first active model date after now
                                         iterate = false;
                                     }
                                 }
-                                else {
-                                    Log.d(tag, "> "
-                                            + Format.dayOfYear(calModel.get(Calendar.DAY_OF_WEEK)) +
-                                            " " + String.valueOf(calModel.get(Calendar.DAY_OF_YEAR))
-                                            + ", repeat: false"
-                                    );
-                                }
-                                String msg = iterate ? "keep going" : "STOP!";
-                                Log.d(tag, "> " + msg);
 
                                 i++;
                             } while (iterate);
                         }
 
                         // assign dateNext
-                        Log.d(tag, dateModel.toString());
                         if (dateNext.getTime() == 0L) {
                             // assign knowing that dateModel is more ideal
-                            Log.d(tag, "dateNext.getTime() == 0");
                             dateNext = dateModel;
-                            nextModelID = model.uniqueID;
+                            idNext = model.uniqueID;
                         }
                         else {
                             //assign, if dateModel is after dateNow && before current assignment
-                            Log.d(tag, "dateNext.getTime() != 0");
                             dateNext = dateModel.after(dateNow) && dateModel.before(dateNext) ?
                                     dateModel : dateNext;
-                            nextModelID = dateNext.compareTo(dateModel) == 0 ? model.uniqueID : nextModelID;
+                            idNext = dateNext.compareTo(dateModel) == 0 ? model.uniqueID : idNext;
                         }
                     }
                 }
                 //write millis and ID to preferences
                 mPrefsMngr.setKeyValue(PreferencesManager.KEY_VALUE_MILLIS, dateNext.getTime());
-                mPrefsMngr.setKeyValue(PreferencesManager.KEY_VALUE_ID, nextModelID);
+                mPrefsMngr.setKeyValue(PreferencesManager.KEY_VALUE_ID, idNext);
             }
             else {
-                Log.d("[ERROR]", "there are no active alarms");
+                // there are no active alarms
             }
         }
         else {
-            Log.d("[ERROR]", "alarm list is empty");
+            // alarm list is empty
         }
-
-        Log.d("[FOUND] getTime", String.valueOf(dateNext.getTime()));
-        Log.d("[FOUND] dateNext", dateNext.toString());
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

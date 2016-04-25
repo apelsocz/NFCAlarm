@@ -2,8 +2,6 @@ package com.example.adam.nfcalarm;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -15,7 +13,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.adam.nfcalarm.data.AlarmDAO;
 import com.example.adam.nfcalarm.model.AlarmModel;
@@ -65,7 +62,7 @@ public class RingingActivity extends AppCompatActivity {
         }
 
         if (!mNfcAdapter.isEnabled()) {
-            MyApplication.getInstance().setmNfcStateReceiver(true);
+            MyApplication.getInstance().enableNfcStateReceiver(true);
             Snackbar snackbar = Snackbar.make(findViewById(R.id.alarmContainer),
                     "Near Field Communication is OFF", Snackbar.LENGTH_INDEFINITE)
                     .setAction("ENABLE", new View.OnClickListener() {
@@ -79,7 +76,7 @@ public class RingingActivity extends AppCompatActivity {
 
         }
         else {
-            MyApplication.getInstance().setmNfcStateReceiver(false);
+            MyApplication.getInstance().enableNfcStateReceiver(false);
         }
 
         /**
@@ -106,7 +103,7 @@ public class RingingActivity extends AppCompatActivity {
 
     public void snooze() {
         MyApplication.getInstance().snooze();
-        MyApplication.getInstance().setmNfcStateReceiver(false);
+        MyApplication.getInstance().enableNfcStateReceiver(false);
         stopRinging();
         finishAffinity();
     }

@@ -3,6 +3,7 @@ package com.example.adam.nfcalarm.ui;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
@@ -21,8 +22,6 @@ import android.widget.Toast;
 import com.example.adam.nfcalarm.AlarmsActivity;
 import com.example.adam.nfcalarm.R;
 import com.example.adam.nfcalarm.data.AlarmDAO;
-import com.example.adam.nfcalarm.data.AlarmDataManager;
-//import com.example.adam.nfcalarm.model.AlarmData;
 import com.example.adam.nfcalarm.model.AlarmModel;
 import com.example.adam.nfcalarm.util.Views;
 
@@ -56,9 +55,10 @@ public class Edit extends Fragment implements View.OnClickListener {
     private CheckBox thursday;
     private CheckBox friday;
     private CheckBox saturday;
+    private FloatingActionButton mFAB;
 
-    private long uniqueID;
     AlarmDAO mAlarmDAO;
+    private long uniqueID;
     private JSONArray alarms;
     private int savedModelIndex;
 
