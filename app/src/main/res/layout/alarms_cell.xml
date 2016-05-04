@@ -6,9 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="80dp"
     app:cardBackgroundColor="@color/colorCardDialogBackground"
-    app:cardCornerRadius="0dp"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp">
+    app:cardElevation="@dimen/cardview_default_elevation"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="@dimen/cardview_default_radius">
 
     <ImageView
         android:layout_width="40dp"
@@ -22,9 +22,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="72dp"
         android:id="@+id/alarms_time"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:textColor="@color/textColorPrimary"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:text="12:00 AM" />
     <TextView
         android:layout_width="wrap_content"
@@ -32,9 +32,9 @@
         android:layout_marginStart="72dp"
         android:layout_gravity="bottom"
         android:id="@+id/alarms_repeat"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textColor="@color/textColorSecondary"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="16dp"
         android:text="Sun, Mon, Tue, Wed, Thu, Fri, Sat" />
 
     <Switch
@@ -43,11 +43,5 @@
         android:id="@+id/alarms_active"
         android:layout_gravity="end|center_vertical"
         android:layout_margin="8dp" />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_gravity="bottom"
-        android:layout_marginStart="72dp"
-        android:background="@color/divider" />
 
 </android.support.v7.widget.CardView>

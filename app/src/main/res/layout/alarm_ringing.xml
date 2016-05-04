@@ -46,18 +46,6 @@
             android:text="Wednesday, January 1st, 2016"
             android:textColor="#FFF"
             android:background="#AA000000" />
-        <TextView
-            android:id="@+id/display_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:fontFamily="sans-serif-smallcaps"
-            android:layout_centerInParent="true"
-            android:textSize="56sp"
-            android:textColor="#FFF"
-            android:background="#AA000000"
-            android:visibility="invisible"/>
     </RelativeLayout>
 
     <ProgressBar

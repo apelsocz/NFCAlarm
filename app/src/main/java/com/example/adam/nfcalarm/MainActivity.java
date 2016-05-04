@@ -2,40 +2,52 @@ package com.example.adam.nfcalarm;
 
 import android.content.Context;
 import android.content.Intent;
-import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.example.adam.nfcalarm.scheduler.AlarmService;
+import com.example.adam.nfcalarm.app.AlarmService;
 
+/**
+ * The Application's controller activity to delegate launching the desired activity
+ */
 public class MainActivity extends AppCompatActivity {
+
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("MainActivity", "onCreate()");
+        Log.d(LOG_TAG, "onCreate()");
+
+        Context context = getApplicationContext();
 
         boolean isRinging = MyApplication.getInstance().isRinging;
         boolean isSnoozed = MyApplication.getInstance().isSnoozing;
 
+        // determine which activity should be started
         if (isRinging || isSnoozed) {
-            Intent activity = new Intent(getApplicationContext(), RingingActivity.class);
             if (isSnoozed) {
-                Context context = getApplicationContext();
+                // play media
                 Intent media = new Intent(context, AlarmService.class);
                 media.setAction(AlarmService.ACTION_PLAY);
-
                 context.startService(media);
+
+                // the app was launched while snoozed, modify the global state
                 MyApplication.getInstance().setSnoozing(false);
                 MyApplication.getInstance().doScheduling(false);
             }
+            // present the user with ringing alarm
+            Intent activity = new Intent(context, RingingActivity.class);
             startActivity(activity);
         }
         else {
-            startActivity(new Intent(getApplicationContext(), AlarmsActivity.class));
+            // present the user the primary activity
+            startActivity(new Intent(context, AlarmsActivity.class));
         }
+
+        // done
         finish();
     }
 }

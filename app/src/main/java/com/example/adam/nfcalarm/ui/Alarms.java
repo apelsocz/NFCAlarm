@@ -1,19 +1,26 @@
 package com.example.adam.nfcalarm.ui;
 
 import android.app.Activity;
+import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
+import android.widget.ViewSwitcher.ViewFactory;
 
 import com.example.adam.nfcalarm.AlarmsActivity;
 import com.example.adam.nfcalarm.R;
@@ -22,6 +29,8 @@ import com.example.adam.nfcalarm.model.AlarmModel;
 import com.example.adam.nfcalarm.util.Data;
 import com.example.adam.nfcalarm.util.Format;
 import com.example.adam.nfcalarm.util.Views;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -33,8 +42,17 @@ public class Alarms extends Fragment {
     private FloatingActionButton mFAB;
     private AlarmDAO mAlarmDAO;
     private List<AlarmModel> mList;
-    private TextView mNextDate;
-    private TextView mNextTime;
+    private TextSwitcher mSwitcherDate;
+    private TextSwitcher mSwitcherTime;
+
+    private ViewFactory mFactory = new ViewFactory() {
+        @Override
+        public View makeView() {
+            TextView t = new TextView(getContext());
+            t.setTextAppearance(R.style.TextAppearance_AppCompat_Medium);
+            return t;
+        }
+    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,8 +71,17 @@ public class Alarms extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mNextDate = (TextView) view.findViewById(R.id.ac_next_date);
-        mNextTime = (TextView) view.findViewById(R.id.ac_next_time);
+        mSwitcherDate = (TextSwitcher) view.findViewById(R.id.ac_next_date);
+        mSwitcherTime = (TextSwitcher) view.findViewById(R.id.ac_next_time);
+        mSwitcherDate.setFactory(mFactory);
+        mSwitcherTime.setFactory(mFactory);
+        Context c = view.getContext();
+        Animation in = AnimationUtils.loadAnimation(c, android.R.anim.fade_in);
+        Animation out = AnimationUtils.loadAnimation(c, android.R.anim.fade_out);
+        mSwitcherDate.setInAnimation(in);
+        mSwitcherTime.setInAnimation(in);
+        mSwitcherDate.setOutAnimation(out);
+        mSwitcherTime.setOutAnimation(out);
 
         update();
         mAdapter = new Adapter(getActivity(), mList);
@@ -106,15 +133,16 @@ public class Alarms extends Fragment {
     }
 
     private void updateNext() {
-        if (!Data.activeModelInList(mList)) {
-            mNextDate.setText("Nothing Scheduled");
 
-            mNextTime.setText("");
+
+        if (!Data.activeModelInList(mList)) {
+            mSwitcherDate.setText("Nothing Scheduled");
+            mSwitcherTime.setText("");
         }
         else {
             long millis = mAlarmDAO.scheduledMillis();
-            mNextDate.setText(Format.formatDate(millis));
-            mNextTime.setText(Format.formatTime(millis));
+            mSwitcherDate.setText(Format.formatDate(millis));
+            mSwitcherTime.setText(Format.formatTime(millis));
         }
     }
 

@@ -107,14 +107,14 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
             }
             schedule.setText(days);
 
-//            Context context = itemView.getContext();
-//            int id = model.isActive ? R.drawable.ic_alarm_on_white_48dp :
-//                    R.drawable.ic_alarm_off_white_48dp;
-//            icon.setImageDrawable(ContextCompat.getDrawable(context, id));
+            Context context = itemView.getContext();
+            int id = model.isActive ? R.drawable.ic_alarm_on_white_48dp :
+                    R.drawable.ic_alarm_off_white_48dp;
+            icon.setImageDrawable(ContextCompat.getDrawable(context, id));
 
-            icon.setBackgroundResource(R.drawable.alarm_cell_icon);
-            AnimationDrawable anim = (AnimationDrawable) icon.getBackground();
-            anim.start();
+//            icon.setBackgroundResource(R.drawable.alarm_cell_icon);
+//            AnimationDrawable anim = (AnimationDrawable) icon.getBackground();
+//            anim.start();
 
             isActive.setChecked(model.isActive);
             isActive.setOnClickListener(this);

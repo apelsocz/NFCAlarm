@@ -16,7 +16,7 @@ import android.view.View;
 
 import com.example.adam.nfcalarm.data.AlarmDAO;
 import com.example.adam.nfcalarm.model.AlarmModel;
-import com.example.adam.nfcalarm.scheduler.AlarmService;
+import com.example.adam.nfcalarm.app.AlarmService;
 import com.example.adam.nfcalarm.ui.Ringing;
 
 public class RingingActivity extends AppCompatActivity {

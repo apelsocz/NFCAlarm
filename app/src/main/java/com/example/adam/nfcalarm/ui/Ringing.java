@@ -32,8 +32,6 @@ public class Ringing extends Fragment {
 
     private TextView mTime;
     private TextView mDate;
-    private ImageView mBackground;
-    private TextView mMessage;
     private ProgressBar mProgress;
     private FloatingActionButton mFAB;
 
@@ -58,13 +56,11 @@ public class Ringing extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.alarm_ringing, container, false);
 
+        View rootView = inflater.inflate(R.layout.alarm_ringing, container, false);
         mTime = (TextView) rootView.findViewById(R.id.display_time);
         mDate = (TextView) rootView.findViewById(R.id.display_date);
-        mBackground = (ImageView) rootView.findViewById(R.id.display_background);
         mProgress = (ProgressBar) rootView.findViewById(R.id.display_progress);
-        mMessage = (TextView) rootView.findViewById(R.id.display_message);
 
         return rootView;
     }
@@ -79,7 +75,7 @@ public class Ringing extends Fragment {
             @Override
             public boolean onLongClick(View v) {
                 if (v.equals(mFAB)){
-                    ((RingingActivity)activity).dismiss();
+                    ((RingingActivity)activity).snooze();
                 }
                 return false;
             }
@@ -104,23 +100,5 @@ public class Ringing extends Fragment {
     private void update() {
         mDate.setText(Format.formatDate(Calendar.getInstance().getTimeInMillis()));
         mTime.setText(Format.formatTime(Calendar.getInstance().getTimeInMillis()));
-    }
-
-    public void snooze() {
-        mTime.setVisibility(View.INVISIBLE);
-        mDate.setVisibility(View.INVISIBLE);
-        mProgress.setVisibility(View.INVISIBLE);
-        mFAB.setVisibility(View.INVISIBLE);
-        mMessage.setText("Snoozing !");
-        mMessage.setVisibility(View.VISIBLE);
-    }
-
-    public void dismiss() {
-        mTime.setVisibility(View.INVISIBLE);
-        mDate.setVisibility(View.INVISIBLE);
-        mProgress.setVisibility(View.INVISIBLE);
-        mFAB.setVisibility(View.INVISIBLE);
-        mMessage.setText("Dismissed !");
-        mMessage.setVisibility(View.VISIBLE);
     }
 }

@@ -13,7 +13,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/icon_nfc"
+        android:icon="@mipmap/nfc_alarm"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         android:name=".MyApplication"
@@ -21,6 +21,8 @@
         
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:taskAffinity="@string/task_affinity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -29,9 +31,13 @@
         </activity>
 
         <activity android:name=".AlarmsActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:taskAffinity="@string/task_affinity" />
 
         <activity android:name=".RingingActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:taskAffinity="@string/task_affinity"
             android:noHistory="true"
             android:clearTaskOnLaunch="true"
@@ -47,16 +53,16 @@
         </activity>
 
 
-        <receiver android:name=".scheduler.WakefulAlarmReceiver"/>
+        <receiver android:name=".app.WakefulReceiver"/>
 
-        <receiver android:name=".scheduler.AlarmBootReceiver"
+        <receiver android:name=".app.BootReceiver"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
         
-        <receiver android:name=".scheduler.NfcStateReceiver"
+        <receiver android:name=".app.NfcStateReceiver"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.nfc.action.ADAPTER_STATE_CHANGED"/>
@@ -64,9 +70,11 @@
         </receiver>
 
 
-        <service android:name=".scheduler.SchedulingService"/>
+        <service android:name=".app.RingingService"/>
 
-        <service android:name=".scheduler.AlarmService"/>
+        <service android:name=".app.ScheduleService"/>
+
+        <service android:name=".app.AlarmService"/>
 
     </application>
 

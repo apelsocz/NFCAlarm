@@ -1,4 +1,4 @@
-package com.example.adam.nfcalarm.scheduler;
+package com.example.adam.nfcalarm.app;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -6,11 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
-import android.os.Bundle;
-import android.util.Log;
 
 import com.example.adam.nfcalarm.MainActivity;
-import com.example.adam.nfcalarm.RingingActivity;
 
 public class NfcStateReceiver extends BroadcastReceiver {
 

@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 public class PreferencesManager {
-    private static final String PREF_NAME = PreferencesManager.class.getSimpleName();
+    public static final String PREF_NAME = PreferencesManager.class.getSimpleName();
 
     public static final String KEY_VALUE_ALARMS = "com.example.adam.nfcalarm.data.KEY_VALUE_ALARMS";
     public static final String KEY_VALUE_MILLIS = "com.example.adam.nfcalarm.data.KEY_VALUE_MILLIS";
