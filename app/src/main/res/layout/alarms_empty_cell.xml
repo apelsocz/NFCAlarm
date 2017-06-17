@@ -16,7 +16,7 @@
             android:fontFamily="sans-serif-regular"
             android:textSize="45sp"
             android:textColor="@color/textColorPrimary"
-            android:text="@string/alarms_no_data"
+            android:text="@string/title_no_alarms"
             android:focusable="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

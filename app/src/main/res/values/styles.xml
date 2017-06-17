@@ -29,9 +29,4 @@
     <style name="PopupTheme" parent="ThemeOverlay.AppCompat.Dark">
     </style>
 
-    <style name="DialogTheme"
-           parent="Theme.AppCompat.Light.Dialog">
-        <item name="android:colorAccent">@color/accentColor</item>
-    </style>
-
 </resources>
