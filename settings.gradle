@@ -1,1 +1,1 @@
-include ':app', ':tapthattoo', ':myapplication'
+include ':app'
