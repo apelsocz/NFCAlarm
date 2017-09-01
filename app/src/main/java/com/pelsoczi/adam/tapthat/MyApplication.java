@@ -1,17 +1,22 @@
 package com.pelsoczi.adam.tapthat;
 
 import android.app.Application;
+import android.arch.persistence.room.Room;
 
 import com.pelsoczi.adam.tapthat.app.NfcStateReceiver;
 import com.pelsoczi.adam.tapthat.app.WakefulReceiver;
 import com.pelsoczi.adam.tapthat.data.AlarmDAO;
+import com.pelsoczi.data.Alarm;
+import com.pelsoczi.data.AlarmDatabase;
 
 // TODO: 16-04-08 add prompt - would you like to repeat this tomorrow? if model.once
 // TODO: 16-04-11 show notification when user leaves the app
 
 public class MyApplication extends Application {
 
-    /** Reference to the global application as singleton */
+    /**
+     * Reference to the global application as singleton
+     * */
     private static MyApplication sInstance;
 
     /**
@@ -26,6 +31,7 @@ public class MyApplication extends Application {
     private NfcStateReceiver mNfcState = new NfcStateReceiver();
 
     private AlarmDAO mAlarmDAO;
+    private AlarmDatabase alarmDb;
     public boolean isRinging = false;
     public boolean isSnoozing = false;
 
@@ -44,6 +50,12 @@ public class MyApplication extends Application {
 
         // initialize data access object
         mAlarmDAO = new AlarmDAO();
+
+        sInstance.alarmDb = Room.databaseBuilder(this, AlarmDatabase.class,
+                AlarmDatabase.Companion.getDATABASE_NAME())
+                .build();
+
+        Alarm alarm = Alarm.Companion.getEMPTY();
     }
 
     /**
