@@ -1,5 +1,8 @@
 package com.pelsoczi.adam.tapthat;
 
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.LifecycleRegistryOwner;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,9 +14,17 @@ import com.pelsoczi.adam.tapthat.app.MediaService;
 /**
  * The Application's controller activity to delegate launching the desired activity
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LifecycleRegistryOwner {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+
+    /**
+     * Turns this custom Activity into a {@link LifecycleOwner} by implementation of the
+     * built-in {@link LifecycleRegistryOwner} interface
+     * */
+    LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
+    @Override
+    public LifecycleRegistry getLifecycle() { return lifecycleRegistry; }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

@@ -1,5 +1,8 @@
 package com.pelsoczi.adam.tapthat;
 
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.LifecycleRegistryOwner;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
@@ -18,7 +21,7 @@ import org.json.JSONArray;
 /**
  * The primary activity which controls the user's interactions.
  */
-public class AlarmsActivity extends AppCompatActivity {
+public class AlarmsActivity extends AppCompatActivity implements LifecycleRegistryOwner {
 
     private static final String LOG_TAG = AlarmsActivity.class.getSimpleName();
 
@@ -28,6 +31,14 @@ public class AlarmsActivity extends AppCompatActivity {
      * A data access object encapsulating a singleton data layer below it.
      */
     private AlarmDAO mAlarmDAO;
+
+    /**
+     * Turns this custom Activity into a {@link LifecycleOwner} by implementation of the
+     * built-in {@link LifecycleRegistryOwner} interface
+     * */
+    LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
+    @Override
+    public LifecycleRegistry getLifecycle() { return lifecycleRegistry; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

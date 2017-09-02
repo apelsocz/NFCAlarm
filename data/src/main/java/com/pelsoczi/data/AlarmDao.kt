@@ -8,7 +8,7 @@ import io.reactivex.Flowable
 interface AlarmDao {
 
     @Query("SELECT * FROM alarms")
-    fun loadAll(): Flowable<MutableList<Alarm>>
+    fun loadAlarmsList(): Flowable<MutableList<Alarm>>
 
     @Query("SELECT * FROM alarms WHERE id = :id LIMIT 1")
     fun loadAlarm(id: Int): Flowable<Alarm>

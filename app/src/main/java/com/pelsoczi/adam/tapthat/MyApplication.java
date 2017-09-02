@@ -1,7 +1,6 @@
 package com.pelsoczi.adam.tapthat;
 
 import android.app.Application;
-import android.arch.persistence.room.Room;
 
 import com.pelsoczi.adam.tapthat.app.NfcStateReceiver;
 import com.pelsoczi.adam.tapthat.app.WakefulReceiver;
@@ -32,6 +31,7 @@ public class MyApplication extends Application {
 
     private AlarmDAO mAlarmDAO;
     private AlarmDatabase alarmDb;
+    AlarmViewModel alarmViewModel;
     public boolean isRinging = false;
     public boolean isSnoozing = false;
 
@@ -48,12 +48,10 @@ public class MyApplication extends Application {
         super.onCreate();
         sInstance = this;
 
-        // initialize data access object
+        // initialize data
         mAlarmDAO = new AlarmDAO();
 
-        sInstance.alarmDb = Room.databaseBuilder(this, AlarmDatabase.class,
-                AlarmDatabase.Companion.getDATABASE_NAME())
-                .build();
+        sInstance.alarmViewModel = new AlarmViewModel(this);
 
         Alarm alarm = Alarm.Companion.getEMPTY();
     }

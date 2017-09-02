@@ -2,6 +2,9 @@ package com.pelsoczi.adam.tapthat;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.LifecycleRegistryOwner;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -20,12 +23,20 @@ import com.pelsoczi.adam.tapthat.data.AlarmDAO;
 import com.pelsoczi.adam.tapthat.model.AlarmModel;
 import com.pelsoczi.adam.tapthat.ui.Ringing;
 
-public class RingingActivity extends AppCompatActivity {
+public class RingingActivity extends AppCompatActivity implements LifecycleRegistryOwner {
 
     public static final String ACTION_SNOOZE_ALARM = "com.pelsoczi.adam.tapthat.ACTION_SNOOZE_ALARM";
 
     private NfcAdapter mNfcAdapter;
     private AudioManager mAudioManager;
+
+    /**
+     * Turns this custom Activity into a {@link LifecycleOwner} by implementation of the
+     * built-in {@link LifecycleRegistryOwner} interface
+     * */
+    LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
+    @Override
+    public LifecycleRegistry getLifecycle() { return lifecycleRegistry; }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
