@@ -1,8 +1,11 @@
 package com.pelsoczi.adam.tapthat.ui;
 
 import android.app.Activity;
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -18,14 +21,18 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher.ViewFactory;
 
+import com.pelsoczi.adam.tapthat.AlarmViewModel;
 import com.pelsoczi.adam.tapthat.AlarmsActivity;
+import com.pelsoczi.adam.tapthat.MyApplication;
 import com.pelsoczi.adam.tapthat.R;
 import com.pelsoczi.adam.tapthat.data.AlarmDAO;
 import com.pelsoczi.adam.tapthat.model.AlarmModel;
 import com.pelsoczi.adam.tapthat.util.Data;
 import com.pelsoczi.adam.tapthat.util.Format;
 import com.pelsoczi.adam.tapthat.util.Views;
+import com.pelsoczi.data.Alarm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Alarms extends Fragment {
@@ -38,11 +45,15 @@ public class Alarms extends Fragment {
     private AlarmDAO mAlarmDAO;
     private List<AlarmModel> mList;
 
-    /** Provides animation capabilities */
+    /**
+     * Provides animation capabilities
+     */
     private TextSwitcher mSwitcherDate;
     private TextSwitcher mSwitcherTime;
 
-    /** Supplies TextView's to TextSwitcher */
+    /**
+     * Supplies TextView's to TextSwitcher
+     */
     private ViewFactory mFactory = new ViewFactory() {
         @Override
         public View makeView() {
@@ -92,12 +103,14 @@ public class Alarms extends Fragment {
         mRecycler = (RecyclerView) view.findViewById(R.id.alarm_container_recycler);
         mRecycler.setHasFixedSize(false);
         mRecycler.setAdapter(mAdapter);
-        mRecycler.setLayoutManager( new LinearLayoutManager(
+        mRecycler.setLayoutManager(new LinearLayoutManager(
                 getActivity(), LinearLayoutManager.VERTICAL, false));
-        mRecycler.setItemAnimator( new DefaultItemAnimator() );
+        mRecycler.setItemAnimator(new DefaultItemAnimator());
     }
 
-    /** Fragment is visible to the user */
+    /**
+     * Fragment is visible to the user
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -106,17 +119,43 @@ public class Alarms extends Fragment {
         Activity activity = getActivity();
         if (!Views.isActivityNull(activity)) {
             mFAB = (FloatingActionButton) activity.findViewById(R.id.floating_action_btn);
-            mFAB.setOnClickListener( new View.OnClickListener() {
+            mFAB.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     //create alarm model and pass it around
-                    ((AlarmsActivity)getActivity()).onAlarmClick(AlarmModel.EMPTY);
+                    ((AlarmsActivity) getActivity()).onAlarmClick(AlarmModel.EMPTY);
                 }
             });
         }
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Handler handler = new Handler();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlarmViewModel viewModel = MyApplication.getInstance().getAlarmViewModel();
+                        LiveData<List<Alarm>> liveData =
+                                MyApplication.getInstance().getAlarmViewModel().getliveAlarmData();
+//
+                        List<Alarm> inMemory = new ArrayList<Alarm>();
+                        viewModel.populateRoom(new ArrayList<Alarm>() {{
+                            add(new Alarm(0));
+                            add(new Alarm(1));
+                        }});
+
+
+
+                    }
+                });
+            }
+        }, 1000);
     }
 
-    /** <p>Initialize a new instance of Data Access Object, forcing an update to data set.</p>
+    /**
+     * <p>Initialize a new instance of Data Access Object, forcing an update to data set.</p>
      * Called by {@link Alarms#onViewCreated(View, Bundle)} and
      * {@link AlarmsActivity#onEditUpdate()}
      */
@@ -139,7 +178,9 @@ public class Alarms extends Fragment {
         updateNext();
     }
 
-    /** Updates data and swaps Adapter while allowing for ViewHolder animations */
+    /**
+     * Updates data and swaps Adapter while allowing for ViewHolder animations
+     */
     public void toggleAlarm(AlarmModel model) {
 //        Log.d(LOG_NAME, "toggleAlarm()");
 
@@ -148,13 +189,14 @@ public class Alarms extends Fragment {
         updateNext();
     }
 
-    /** Animates TextView which displays the next alarm which will ring */
+    /**
+     * Animates TextView which displays the next alarm which will ring
+     */
     private void updateNext() {
         if (!Data.activeModelInList(mList)) {
             mSwitcherDate.setText(getString(R.string.title_next_empty));
             mSwitcherTime.setText(getResources().getString(R.string.empty));
-        }
-        else {
+        } else {
             long millis = mAlarmDAO.scheduledMillis();
             mSwitcherDate.setText(Format.formatDate(millis));
             mSwitcherTime.setText(Format.formatTime(millis));

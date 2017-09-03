@@ -5,7 +5,6 @@ import android.app.Application;
 import com.pelsoczi.adam.tapthat.app.NfcStateReceiver;
 import com.pelsoczi.adam.tapthat.app.WakefulReceiver;
 import com.pelsoczi.adam.tapthat.data.AlarmDAO;
-import com.pelsoczi.data.Alarm;
 import com.pelsoczi.data.AlarmDatabase;
 
 // TODO: 16-04-08 add prompt - would you like to repeat this tomorrow? if model.once
@@ -31,7 +30,7 @@ public class MyApplication extends Application {
 
     private AlarmDAO mAlarmDAO;
     private AlarmDatabase alarmDb;
-    AlarmViewModel alarmViewModel;
+    private AlarmViewModel alarmViewModel;
     public boolean isRinging = false;
     public boolean isSnoozing = false;
 
@@ -52,8 +51,10 @@ public class MyApplication extends Application {
         mAlarmDAO = new AlarmDAO();
 
         sInstance.alarmViewModel = new AlarmViewModel(this);
+    }
 
-        Alarm alarm = Alarm.Companion.getEMPTY();
+    public AlarmViewModel getAlarmViewModel() {
+        return sInstance.alarmViewModel;
     }
 
     /**

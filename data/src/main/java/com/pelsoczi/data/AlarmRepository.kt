@@ -21,4 +21,14 @@ class AlarmRepository(context: Context) {
                 }
         return mutableLiveData
     }
+
+    /** should return the amount updated */
+    fun updateAlarms(alarms: List<Alarm>) {
+        alarmDatabase.alarmDao().updateAlarms(alarms.toMutableList())
+    }
+
+    /** should return true false */
+    fun deleteAlarms(alarms: List<Alarm>) {
+        alarmDatabase.alarmDao().deleteAlarms(alarms.toMutableList())
+    }
 }
