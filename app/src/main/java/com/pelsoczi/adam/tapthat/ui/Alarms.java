@@ -1,11 +1,8 @@
 package com.pelsoczi.adam.tapthat.ui;
 
 import android.app.Activity;
-import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -21,18 +18,14 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher.ViewFactory;
 
-import com.pelsoczi.adam.tapthat.AlarmViewModel;
 import com.pelsoczi.adam.tapthat.AlarmsActivity;
-import com.pelsoczi.adam.tapthat.MyApplication;
 import com.pelsoczi.adam.tapthat.R;
 import com.pelsoczi.adam.tapthat.data.AlarmDAO;
 import com.pelsoczi.adam.tapthat.model.AlarmModel;
 import com.pelsoczi.adam.tapthat.util.Data;
 import com.pelsoczi.adam.tapthat.util.Format;
 import com.pelsoczi.adam.tapthat.util.Views;
-import com.pelsoczi.data.Alarm;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Alarms extends Fragment {
@@ -127,31 +120,6 @@ public class Alarms extends Fragment {
                 }
             });
         }
-
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Handler handler = new Handler();
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        AlarmViewModel viewModel = MyApplication.getInstance().getAlarmViewModel();
-                        LiveData<List<Alarm>> liveData =
-                                MyApplication.getInstance().getAlarmViewModel().getliveAlarmData();
-//
-                        List<Alarm> inMemory = new ArrayList<Alarm>();
-                        viewModel.populateRoom(new ArrayList<Alarm>() {{
-                            add(new Alarm(0));
-                            add(new Alarm(1));
-                        }});
-
-
-
-                    }
-                });
-            }
-        }, 1000);
     }
 
     /**
