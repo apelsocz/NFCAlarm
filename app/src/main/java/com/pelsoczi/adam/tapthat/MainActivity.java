@@ -12,7 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.pelsoczi.adam.tapthat.app.MediaService;
 
 /**
- * The Application's controller activity to delegate launching the desired activity
+ * The kotlin.Application's controller activity to delegate launching the desired activity
  */
 public class MainActivity extends AppCompatActivity implements LifecycleRegistryOwner {
 

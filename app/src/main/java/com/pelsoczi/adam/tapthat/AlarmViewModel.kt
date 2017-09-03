@@ -13,12 +13,11 @@ class AlarmViewModel(application: MyApplication) : AndroidViewModel(application)
 
     private var alarmRepository = AlarmRepository(application.applicationContext)
 
-    private lateinit var liveAlarmData: LiveData<List<Alarm>>
-    fun getliveAlarmData() = liveAlarmData
+    private var alarmLiveData: LiveData<List<Alarm>>
 
     init {
-        liveAlarmData = alarmRepository.loadAlarmsList()
-        liveAlarmData.observeForever { alarmList: List<Alarm>? ->
+        alarmLiveData = alarmRepository.loadAlarmsList()
+        alarmLiveData.observeForever { alarmList: List<Alarm>? ->
             alarmList?.let {
                 val total = it.size
                 if (total > 0) {
@@ -30,12 +29,10 @@ class AlarmViewModel(application: MyApplication) : AndroidViewModel(application)
         }
     }
 
+    fun alarmsLiveData() = alarmLiveData
+
     fun populateRoom(alarmList: List<Alarm>) {
         alarmRepository.updateAlarms(alarmList)
-    }
-
-    fun alarmsListLiveData(): LiveData<List<Alarm>>? {
-        return liveAlarmData
     }
 
     fun updateAlarms(alarms: List<Alarm>) {

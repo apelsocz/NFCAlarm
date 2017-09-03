@@ -23,7 +23,7 @@ data class Alarm @Ignore constructor(
 
     companion object {
         val NAME = "Alarm"
-//        val EMPTY = Alarm(System.currentTimeMillis())
+        val EMPTY = Alarm(System.currentTimeMillis())
     }
 
     constructor(id: Long) : this(id, 0, 0, 0L, false, false,

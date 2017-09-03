@@ -1,3 +1,5 @@
+package com.pelsoczi.adam.tapthat.kotlin
+
 import android.app.Application
 
 class Application : Application() {
