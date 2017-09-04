@@ -14,10 +14,11 @@ abstract class AlarmDatabase : RoomDatabase() {
     companion object {
         const val NAME = "AlarmDatabase"
         const val DATABASE_NAME = "alarms-db"
-        const val DATABASE_VERSION = 1
+        const val DATABASE_VERSION = 2
 
         fun instance(context: Context): AlarmDatabase = Room.databaseBuilder(
                 context.applicationContext, AlarmDatabase::class.java, DATABASE_NAME)
+                .fallbackToDestructiveMigration()
                 .build()
                 .also { Log.d(NAME, "[$DATABASE_NAME v.$DATABASE_VERSION] as persistent") }
     }

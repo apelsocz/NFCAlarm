@@ -146,7 +146,6 @@
     <orderEntry type="library" name="runtime-1.0.0-alpha9" level="project" />
     <orderEntry type="library" name="1_runtime-1.0.0-alpha9" level="project" />
     <orderEntry type="library" name="2_runtime-1.0.0-alpha9" level="project" />
-    <orderEntry type="library" scope="TEST" name="multidex-instrumentation-1.0.2" level="project" />
     <orderEntry type="library" name="reactive-streams-1.0.0" level="project" />
     <orderEntry type="library" name="rxjava2-1.0.0-alpha9" level="project" />
     <orderEntry type="library" name="support-compat-26.0.2" level="project" />

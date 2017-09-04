@@ -22,6 +22,8 @@ class AlarmRepository(context: Context) {
         return mutableLiveData
     }
 
+    fun loadAlarmById(id: Long) = alarmDatabase.alarmDao().loadAlarm(id)
+
     /** should return the amount updated */
     fun updateAlarms(alarms: List<Alarm>) {
         alarmDatabase.alarmDao().updateAlarms(alarms.toMutableList())

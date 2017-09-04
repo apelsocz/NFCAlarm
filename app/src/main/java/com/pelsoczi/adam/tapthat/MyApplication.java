@@ -5,6 +5,7 @@ import android.app.Application;
 import com.pelsoczi.adam.tapthat.app.NfcStateReceiver;
 import com.pelsoczi.adam.tapthat.app.WakefulReceiver;
 import com.pelsoczi.adam.tapthat.data.AlarmDAO;
+import com.pelsoczi.adam.tapthat.kotlin.AlarmViewModel;
 import com.pelsoczi.data.AlarmDatabase;
 
 // TODO: 16-04-08 add prompt - would you like to repeat this tomorrow? if model.once
@@ -49,8 +50,6 @@ public class MyApplication extends Application {
 
         // initialize data
         mAlarmDAO = new AlarmDAO();
-
-        sInstance.alarmViewModel = new AlarmViewModel(this);
     }
 
     public AlarmViewModel getAlarmViewModel() {

@@ -1,4 +1,4 @@
-package com.pelsoczi.adam.tapthat
+package com.pelsoczi.adam.tapthat.kotlin
 
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
@@ -7,13 +7,14 @@ import com.pelsoczi.data.Alarm
 import com.pelsoczi.data.AlarmRepository
 
 
-class AlarmViewModel(application: MyApplication) : AndroidViewModel(application) {
+class AlarmViewModel(application: Application) : AndroidViewModel(application) {
 
     val NAME = AlarmViewModel::class.java.simpleName ?: "AlarmViewModel"
 
     private var alarmRepository = AlarmRepository(application.applicationContext)
 
     private var alarmLiveData: LiveData<List<Alarm>>
+    private var selected = Alarm.EMPTY
 
     init {
         alarmLiveData = alarmRepository.loadAlarmsList()
@@ -31,15 +32,14 @@ class AlarmViewModel(application: MyApplication) : AndroidViewModel(application)
 
     fun alarmsLiveData() = alarmLiveData
 
-    fun populateRoom(alarmList: List<Alarm>) {
-        alarmRepository.updateAlarms(alarmList)
+    fun select(alarm: Alarm) {
+        val index = alarmLiveData.value?.indexOf(alarm)
+        if (index != null && index != -1) {
+            selected = alarmLiveData.value?.get(index) ?: Alarm.EMPTY
+        }
     }
 
-    fun updateAlarms(alarms: List<Alarm>) {
-        alarmRepository.updateAlarms(alarms.toMutableList())
-    }
+    fun getSelected() = selected
 
-    fun deleteAlarms(alarms: List<Alarm>) {
-        alarmRepository.deleteAlarms(alarms.toMutableList())
-    }
+    fun updateAlarms(alarms: List<Alarm>) = alarmRepository.updateAlarms(alarms)
 }

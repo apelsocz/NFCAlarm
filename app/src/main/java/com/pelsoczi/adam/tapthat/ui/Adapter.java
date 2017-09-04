@@ -11,11 +11,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
-import com.pelsoczi.adam.tapthat.AlarmsActivity;
+
 import com.pelsoczi.adam.tapthat.R;
-import com.pelsoczi.adam.tapthat.model.AlarmModel;
+import com.pelsoczi.adam.tapthat.kotlin.ui.AlarmActivity;
 import com.pelsoczi.adam.tapthat.util.Format;
 import com.pelsoczi.adam.tapthat.util.Views;
+import com.pelsoczi.data.Alarm;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -23,14 +24,14 @@ import java.util.List;
 
 public class Adapter extends RecyclerView.Adapter<ViewHolder> {
     private final LayoutInflater layoutInflater;
-    private final List<AlarmModel> items;
+    private final List<Alarm> items;
     //cache for quicker response
     private final int itemsSize;
 
     private static final class CellViewHolder extends ViewHolder implements View.OnClickListener {
 
         /** model representing the ViewHolder's data */
-        private AlarmModel model;
+        private Alarm model;
 
         private final TextView time;
         private final TextView schedule;
@@ -45,58 +46,56 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
             isActive = (Switch) view.findViewById(R.id.alarms_active);
         }
 
-        private void update(AlarmModel model) {
-            if (model == null || model.isEmpty) {
-                return;
-            }
-
+        private void update(Alarm model) {
+            //todo model isEmpty
+            
             this.model = model;
             itemView.setOnClickListener(this);
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(0L);
-            calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(model.hour));
-            calendar.set(Calendar.MINUTE, Integer.valueOf(model.minute));
+            calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(model.getHour()));
+            calendar.set(Calendar.MINUTE, Integer.valueOf(model.getMinute()));
 
             time.setText(Format.formatTime(calendar.getTimeInMillis()));
 
             String days = "";
-            if (model.sunday && model.monday && model.tuesday && model.wednesday
-                    && model.thursday && model.friday && model.saturday) {
+            if (model.getSunday() && model.getMonday() && model.getTuesday() && model.getWednesday()
+                    && model.getThursday() && model.getFriday() && model.getSaturday()) {
                 days = "Daily";
             }
-            else if (!model.sunday && model.monday && model.tuesday && model.wednesday
-                    && model.thursday && model.friday && !model.saturday) {
+            else if (!model.getSunday() && model.getMonday() && model.getTuesday() && model.getWednesday()
+                    && model.getThursday() && model.getFriday() && !model.getSaturday()) {
                 days = "Weekdays";
             }
-            else if (model.sunday && !model.monday && !model.tuesday && !model.wednesday
-                    && !model.thursday && !model.friday && model.saturday) {
+            else if (model.getSunday() && !model.getMonday() && !model.getTuesday() && !model.getWednesday()
+                    && !model.getThursday() && !model.getFriday() && model.getSaturday()) {
                 days = "Weekends";
             }
             else {
-                if (model.once) {
+                if (model.getOnce()) {
                     days = "Once";
                 }
                 else {
-                    if (model.sunday) {
+                    if (model.getSunday()) {
                         days += "Sun, ";
                     }
-                    if (model.monday) {
+                    if (model.getMonday()) {
                         days += "Mon, ";
                     }
-                    if (model.tuesday) {
+                    if (model.getTuesday()) {
                         days += "Tue, ";
                     }
-                    if (model.wednesday) {
+                    if (model.getWednesday()) {
                         days += "Wed, ";
                     }
-                    if (model.thursday) {
+                    if (model.getThursday()) {
                         days += "Thu, ";
                     }
-                    if (model.friday) {
+                    if (model.getFriday()) {
                         days += "Fri, ";
                     }
-                    if (model.saturday) {
+                    if (model.getSaturday()) {
                         days += "Sat";
                     }
 
@@ -108,24 +107,24 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
             schedule.setText(days);
 
             Context context = itemView.getContext();
-            int id = model.isActive ? R.drawable.ic_alarm_on_white_48dp :
+            int id = model.getActive() ? R.drawable.ic_alarm_on_white_48dp :
                     R.drawable.ic_alarm_off_white_48dp;
             icon.setImageDrawable(ContextCompat.getDrawable(context, id));
 
-            isActive.setChecked(model.isActive);
+            isActive.setChecked(model.getActive());
             isActive.setOnClickListener(this);
         }
 
         @Override
         public void onClick(final View view) {
-            AlarmsActivity activity = (AlarmsActivity) view.getContext();
+            AlarmActivity activity = (AlarmActivity) view.getContext();
             if (!Views.isActivityNull(activity)) {
                 //create shallow copy of the model and pass it around
                 if (isActive.equals(view)) {
-                    AlarmModel currentModel = new AlarmModel(model.uniqueID, !model.isActive,
-                            model.hour, model.minute, model.once, model.sunday, model.monday,
-                            model.tuesday, model.wednesday, model.thursday, model.friday,
-                            model.saturday);
+                    Alarm currentModel = new Alarm(model.getId(), model.getHour(), model.getMinute(),
+                            model.getActive(), model.getOnce(), model.getSunday(), model.getMonday(),
+                            model.getTuesday(), model.getWednesday(), model.getThursday(),
+                            model.getFriday(), model.getSaturday());
                     update(currentModel);
                     activity.onActiveToggle(model);
                 }
@@ -136,10 +135,10 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    public Adapter(@NonNull Context context, List<AlarmModel> items) {
+    public Adapter(@NonNull Context context, List<Alarm> items) {
         layoutInflater = LayoutInflater.from(context);
         setHasStableIds(true);
-        this.items = items != null ? items : Collections.<AlarmModel> emptyList();
+        this.items = items != null ? items : Collections.<Alarm> emptyList();
         itemsSize = this.items.size();
     }
 
@@ -147,8 +146,9 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
     public int getItemViewType(int position) {
         // if model is null and only one item, we treat this one as no data - will be used
         // to load R.layout.contacts_empty_cell. Otherwise regular layout.
-        AlarmModel model = items.get(position);
-        int vType = model.isEmpty ? R.layout.alarms_empty_cell : R.layout.alarms_cell;
+        Alarm model = items.get(position);
+        int vType = model.equals(Alarm.Companion.getEMPTY()) ?
+                R.layout.alarms_empty_cell : R.layout.alarms_cell;
 
         return vType;
     }

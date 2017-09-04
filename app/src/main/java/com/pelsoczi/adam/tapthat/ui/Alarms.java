@@ -25,7 +25,9 @@ import com.pelsoczi.adam.tapthat.model.AlarmModel;
 import com.pelsoczi.adam.tapthat.util.Data;
 import com.pelsoczi.adam.tapthat.util.Format;
 import com.pelsoczi.adam.tapthat.util.Views;
+import com.pelsoczi.data.Alarm;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Alarms extends Fragment {
@@ -92,7 +94,8 @@ public class Alarms extends Fragment {
         // load any changes
         update();
 
-        mAdapter = new Adapter(getActivity(), mList);
+//        mAdapter = new Adapter(getActivity(), mList);
+        mAdapter = new Adapter(getActivity(), Collections.<Alarm>emptyList());
         mRecycler = (RecyclerView) view.findViewById(R.id.alarm_container_recycler);
         mRecycler.setHasFixedSize(false);
         mRecycler.setAdapter(mAdapter);
@@ -139,7 +142,8 @@ public class Alarms extends Fragment {
 
         // won't be applied to first run
         if (mRecycler != null) {
-            mAdapter = new Adapter(getActivity(), mList);
+//            mAdapter = new Adapter(getActivity(), mList);
+            mAdapter = new Adapter(getActivity(), Collections.<Alarm>emptyList());
             mRecycler.swapAdapter(mAdapter, false);
         }
 
@@ -153,7 +157,7 @@ public class Alarms extends Fragment {
 //        Log.d(LOG_NAME, "toggleAlarm()");
 
         mAlarmDAO.updateModel(model);
-        mRecycler.swapAdapter(new Adapter(getActivity(), mAlarmDAO.getModelsAsList()), false);
+//        mRecycler.swapAdapter(new Adapter(getActivity(), mAlarmDAO.getModelsAsList()), false);
         updateNext();
     }
 

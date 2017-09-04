@@ -1,10 +1,8 @@
 package com.pelsoczi.adam.tapthat.kotlin.ui
 
-import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.LifecycleRegistry
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
+import android.arch.lifecycle.LifecycleRegistryOwner
+import android.arch.lifecycle.LiveData
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -18,21 +16,26 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
 import android.widget.ViewSwitcher
-import com.pelsoczi.adam.tapthat.AlarmViewModel
 import com.pelsoczi.adam.tapthat.R
+import com.pelsoczi.adam.tapthat.kotlin.Application
+import com.pelsoczi.adam.tapthat.ui.Adapter
 import com.pelsoczi.data.Alarm
 import kotlinx.android.synthetic.main.activity_application.*
 import kotlinx.android.synthetic.main.alarms_fragment.*
 
 
-class AlarmsFragment : Fragment(), LifecycleOwner {
-
+class AlarmsFragment : Fragment(), LifecycleRegistryOwner {
     companion object {
         val NAME = AlarmsFragment::class.java.simpleName
         fun newInstance() = AlarmsFragment()
     }
+    init {
+        println("init{${AlarmsFragment}")
+    }
 
-    private val viewModel = ViewModelProviders.of(activity).get(AlarmViewModel::class.java)
+    private lateinit var alarmsLiveData: LiveData<List<Alarm>>
+    private lateinit var adapter: Adapter
+
     private val factory = ViewSwitcher.ViewFactory {
         val textView = TextView(context)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
@@ -40,13 +43,14 @@ class AlarmsFragment : Fragment(), LifecycleOwner {
         textView
     }
     private val registry = LifecycleRegistry(this)
+
     override fun getLifecycle() = registry
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
-        return LayoutInflater.from(container as? Context)
-                .inflate(R.layout.alarms_fragment, container)
+        super.onCreateView(inflater, container, savedInstanceState)
+        return LayoutInflater.from(container?.context).inflate(R.layout.alarms_fragment,
+                container, false)
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
@@ -65,21 +69,40 @@ class AlarmsFragment : Fragment(), LifecycleOwner {
             setOutAnimation(AnimationUtils.loadAnimation(context, android.R.anim.fade_out))
         }
 
+        adapter = Adapter(context, listOf(Alarm.EMPTY))
         with(alarm_container_recycler) {
             setHasFixedSize(true)
+            adapter = this@AlarmsFragment.adapter
             layoutManager = LinearLayoutManager(activity, VERTICAL, false)
             itemAnimator = DefaultItemAnimator()
         }
 
-        viewModel.alarmsLiveData().observe(this, Observer{ alarms ->
-            Log.d(NAME, alarms?.toString())
-        })
+        alarmsLiveData = (activity.application as Application).getViewModel().alarmsLiveData()
+        alarmsLiveData.observeForever { alarms: List<Alarm>? ->
+            if (alarms != null && alarms.isNotEmpty()) {
+                alarm_container_recycler.swapAdapter(Adapter(context, alarms),
+                        false)
+                this@AlarmsFragment.adapter = alarm_container_recycler.adapter as Adapter
+                updateNext()
+            }
+        }
+
+        activity.floating_action_btn.setOnClickListener { view ->
+            println("$NAME: floating_action_btn onClick")
+            (activity as AlarmActivity).onAlarmClick(Alarm.EMPTY)
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        floating_action_btn.setOnClickListener { view ->
-            (activity as AlarmActivity).onAlarmClick(Alarm.EMPTY)
-        }
+
+    }
+
+    private fun updateNext() {
+        Log.i(NAME, "updateNext()")
+    }
+
+    public fun toggleAlarm(alarm: Alarm) {
+        // viewmodel toggle isactive and recalculate next
     }
 }

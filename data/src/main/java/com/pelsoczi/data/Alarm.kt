@@ -10,9 +10,8 @@ data class Alarm @Ignore constructor(
         @PrimaryKey var id: Long,
         var hour: Int,
         var minute: Int,
-        var next: Long,
         var active: Boolean,
-        var repeats: Boolean,
+        var once: Boolean,
         var sunday: Boolean,
         var monday: Boolean,
         var tuesday: Boolean,
@@ -26,9 +25,9 @@ data class Alarm @Ignore constructor(
         val EMPTY = Alarm(System.currentTimeMillis())
     }
 
-    constructor(id: Long) : this(id, 0, 0, 0L, false, false,
-            //sun  mon    tue    wed    thur   fri    sat
-            false, false, false, false, false, false, false)
+    constructor(id: Long) : this(id, hour = 0, minute = 0, active = false, once = true, sunday = false,
+            monday = false, tuesday = false, wednesday = false, thursday = false, friday = false,
+            saturday = false)
 
     init {
         println("$NAME: $id")
