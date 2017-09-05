@@ -20,7 +20,11 @@ abstract class AlarmDatabase : RoomDatabase() {
                 context.applicationContext, AlarmDatabase::class.java, DATABASE_NAME)
                 .fallbackToDestructiveMigration()
                 .build()
-                .also { Log.d(NAME, "[$DATABASE_NAME v.$DATABASE_VERSION] as persistent") }
+                .also { Log.w(NAME, "instance() returned [$DATABASE_NAME|v.$DATABASE_VERSION]") }
+    }
+
+    init {
+        Log.wtf(NAME, "init{$NAME}")
     }
 
     abstract fun alarmDao(): AlarmDao

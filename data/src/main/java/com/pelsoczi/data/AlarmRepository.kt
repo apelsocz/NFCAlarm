@@ -2,35 +2,41 @@ package com.pelsoczi.data
 
 import android.app.Application
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
 import android.content.Context
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import android.util.Log
 
 class AlarmRepository(context: Context) {
 
-    @Volatile var alarmDatabase = AlarmDatabase.instance(context as Application)
+    val NAME = "AlarmRepository"
 
-    fun loadAlarmsList(): LiveData<List<Alarm>> {
-        val mutableLiveData = MutableLiveData<List<Alarm>>()
-        alarmDatabase.alarmDao().loadAlarmsList()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { alarmList ->
-                    mutableLiveData.value = alarmList
-                }
-        return mutableLiveData
+    private val database = AlarmDatabase.instance(context as Application)
+
+    init {
+        Log.wtf(NAME, "init{$NAME} : $context")
     }
 
-    fun loadAlarmById(id: Long) = alarmDatabase.alarmDao().loadAlarm(id)
-
-    /** should return the amount updated */
-    fun updateAlarms(alarms: List<Alarm>) {
-        alarmDatabase.alarmDao().updateAlarms(alarms.toMutableList())
+    fun getAlarmsList(): LiveData<MutableList<Alarm>> {
+        val list = database.alarmDao().loadAlarmsList()
+        Log.v(NAME, ".getAlarmsList() | return size = ${list.value?.size}")
+        return list
     }
 
-    /** should return true false */
-    fun deleteAlarms(alarms: List<Alarm>) {
-        alarmDatabase.alarmDao().deleteAlarms(alarms.toMutableList())
+    fun insertAlarms(alarms: MutableList<Alarm>) {
+        AppExecutors.DISK().execute {
+            database.alarmDao().insertAlarms(alarms)
+        }
+    }
+
+    fun updateAlarms(alarms: MutableList<Alarm>) {
+        AppExecutors.DISK().execute {
+            database.alarmDao().insertAlarms(alarms)
+        }
+    }
+
+    fun deleteAlarms(alarms: MutableList<Alarm>) {
+        AppExecutors.DISK().execute {
+            Log.d(NAME, "Delete ${alarms.toString()}")
+            database.alarmDao().deleteAlarms(alarms)
+        }
     }
 }

@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import com.pelsoczi.adam.tapthat.R
+import com.pelsoczi.adam.tapthat.kotlin.AlarmViewModel
 import com.pelsoczi.adam.tapthat.kotlin.Application
 import com.pelsoczi.data.Alarm
 import kotlinx.android.synthetic.main.activity_application.*
@@ -18,14 +19,16 @@ import kotlinx.android.synthetic.main.activity_application.*
  */
 class AlarmActivity : AppCompatActivity(), LifecycleRegistryOwner {
 
+    val NAME = "AlarmActivity"
+
     private val registry = LifecycleRegistry(this)
     override fun getLifecycle() = registry
 
-    val NAME = AlarmActivity::getLocalClassName.name
+    lateinit var viewModel: AlarmViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(NAME, "onCreate, savedInstanceState = $savedInstanceState")
+        Log.v(NAME, "onCreate, savedInstanceState = $savedInstanceState")
 
         setContentView(R.layout.activity_application)
         setSupportActionBar(app_bar as Toolbar)
@@ -34,22 +37,25 @@ class AlarmActivity : AppCompatActivity(), LifecycleRegistryOwner {
     }
 
     private fun init() {
+        viewModel = (application as Application).getViewModel()
+
         supportFragmentManager.beginTransaction()
-                .add(R.id.fragmentContainer, AlarmsFragment.newInstance(), AlarmsFragment.NAME)
+                .add(R.id.fragmentContainer, AlarmsFragment(), AlarmsFragment.NAME)
                 .commitAllowingStateLoss()
     }
 
     fun onAlarmClick(alarm: Alarm) {
-        Log.d(NAME, alarm.id.toString())
+        Log.v(NAME, alarm.id.toString())
 
-        (application as Application).getViewModel().select(alarm)
+        viewModel.select(alarm)
 
         floating_action_btn.hide()
+
         supportFragmentManager.popBackStackImmediate(EditFragment.NAME,
                 FragmentManager.POP_BACK_STACK_INCLUSIVE)
         supportFragmentManager.beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .add(R.id.fragmentContainer, EditFragment(), EditFragment.NAME)
+                .replace(R.id.fragmentContainer, EditFragment(), EditFragment.NAME)
                 .addToBackStack(EditFragment.NAME)
                 .commit()
     }
@@ -60,9 +66,23 @@ class AlarmActivity : AppCompatActivity(), LifecycleRegistryOwner {
         alarmFragment.toggleAlarm(alarm)
     }
 
+    fun onEditUpdate(alarm: Alarm) {
+        viewModel.updateAlarm(alarm)
+        floating_action_btn.show()
+        supportFragmentManager.popBackStackImmediate(EditFragment.NAME,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    }
+
+    fun onEditDelete(alarm: Alarm) {
+        viewModel.deleteAlarm(alarm)
+        floating_action_btn.show()
+        supportFragmentManager.popBackStackImmediate(EditFragment.NAME,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    }
+
     override fun onBackPressed() {
         super.onBackPressed()
-        // animate the fab back into view
+        viewModel.resetSelected()
         floating_action_btn.show()
     }
 }

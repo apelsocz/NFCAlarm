@@ -6,40 +6,60 @@ import android.util.Log
 import com.pelsoczi.data.Alarm
 import com.pelsoczi.data.AlarmRepository
 
-
 class AlarmViewModel(application: Application) : AndroidViewModel(application) {
 
-    val NAME = AlarmViewModel::class.java.simpleName ?: "AlarmViewModel"
+    val NAME = "AlarmViewModel"
 
-    private var alarmRepository = AlarmRepository(application.applicationContext)
+    private val alarmRepository: AlarmRepository
+    private var alarmLiveData: LiveData<MutableList<Alarm>>
 
-    private var alarmLiveData: LiveData<List<Alarm>>
     private var selected = Alarm.EMPTY
 
     init {
-        alarmLiveData = alarmRepository.loadAlarmsList()
-        alarmLiveData.observeForever { alarmList: List<Alarm>? ->
-            alarmList?.let {
-                val total = it.size
-                if (total > 0) {
-                    alarmRepository.updateAlarms(it)
-                    // schedule service for next alarm intent delivery
-                    Log.d(NAME, "Updated $total LiveData")
-                }
+        Log.wtf(NAME, "init{$NAME}")
+
+        alarmRepository = AlarmRepository(application.applicationContext)
+        alarmLiveData = alarmRepository.getAlarmsList()
+
+        alarmLiveData.observeForever { alarms ->
+            if (alarms != null && alarms.size > 0) {
+                Log.v(NAME, "alarmLiveData.observe { ${alarmLiveData.value?.size} }")
+
+//                updateNext()
             }
         }
     }
 
-    fun alarmsLiveData() = alarmLiveData
+    fun getAlarms() = alarmLiveData
+
+    fun updateAlarm(alarm: Alarm) {
+        if (alarm != Alarm.EMPTY) {
+            alarmRepository.insertAlarms(mutableListOf(alarm))
+        }
+        resetSelected()
+    }
+
+    fun deleteAlarm(alarm: Alarm) {
+        if (alarm != Alarm.EMPTY) {
+            Log.d(NAME, "Delete Alarm ${alarm.id}")
+            alarmRepository.deleteAlarms(mutableListOf(alarm))
+        }
+        resetSelected()
+    }
 
     fun select(alarm: Alarm) {
-        val index = alarmLiveData.value?.indexOf(alarm)
-        if (index != null && index != -1) {
-            selected = alarmLiveData.value?.get(index) ?: Alarm.EMPTY
+        if (alarm == Alarm.EMPTY) {
+            selected = Alarm.EMPTY
+        }
+        else {
+            val index = alarmLiveData.value?.indexOf(alarm)
+            if (index != null && index != -1) {
+                selected = alarmLiveData.value?.get(index) ?: Alarm.EMPTY
+            }
         }
     }
 
     fun getSelected() = selected
 
-    fun updateAlarms(alarms: List<Alarm>) = alarmRepository.updateAlarms(alarms)
+    fun resetSelected() { selected = Alarm.EMPTY }
 }

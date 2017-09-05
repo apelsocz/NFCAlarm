@@ -3,6 +3,7 @@ package com.pelsoczi.data
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.PrimaryKey
+import android.util.Log
 
 
 @Entity(tableName = "alarms")
@@ -22,7 +23,7 @@ data class Alarm @Ignore constructor(
 
     companion object {
         val NAME = "Alarm"
-        val EMPTY = Alarm(System.currentTimeMillis())
+        val EMPTY = Alarm(0L)
     }
 
     constructor(id: Long) : this(id, hour = 0, minute = 0, active = false, once = true, sunday = false,
@@ -30,6 +31,6 @@ data class Alarm @Ignore constructor(
             saturday = false)
 
     init {
-        println("$NAME: $id")
+        Log.wtf(NAME, "init{$id}")
     }
 }

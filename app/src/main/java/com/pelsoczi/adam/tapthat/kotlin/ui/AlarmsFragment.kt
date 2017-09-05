@@ -1,8 +1,6 @@
 package com.pelsoczi.adam.tapthat.kotlin.ui
 
-import android.arch.lifecycle.LifecycleRegistry
-import android.arch.lifecycle.LifecycleRegistryOwner
-import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.Observer
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -17,24 +15,19 @@ import android.view.animation.AnimationUtils
 import android.widget.TextView
 import android.widget.ViewSwitcher
 import com.pelsoczi.adam.tapthat.R
-import com.pelsoczi.adam.tapthat.kotlin.Application
 import com.pelsoczi.adam.tapthat.ui.Adapter
 import com.pelsoczi.data.Alarm
 import kotlinx.android.synthetic.main.activity_application.*
 import kotlinx.android.synthetic.main.alarms_fragment.*
 
+class AlarmsFragment : Fragment() {
 
-class AlarmsFragment : Fragment(), LifecycleRegistryOwner {
     companion object {
         val NAME = AlarmsFragment::class.java.simpleName
-        fun newInstance() = AlarmsFragment()
     }
     init {
-        println("init{${AlarmsFragment}")
+        Log.wtf(NAME, "init{$NAME}")
     }
-
-    private lateinit var alarmsLiveData: LiveData<List<Alarm>>
-    private lateinit var adapter: Adapter
 
     private val factory = ViewSwitcher.ViewFactory {
         val textView = TextView(context)
@@ -42,9 +35,6 @@ class AlarmsFragment : Fragment(), LifecycleRegistryOwner {
             textView.setTextAppearance(R.style.TextAppearance_AppCompat_Medium)
         textView
     }
-    private val registry = LifecycleRegistry(this)
-
-    override fun getLifecycle() = registry
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -69,37 +59,34 @@ class AlarmsFragment : Fragment(), LifecycleRegistryOwner {
             setOutAnimation(AnimationUtils.loadAnimation(context, android.R.anim.fade_out))
         }
 
-        adapter = Adapter(context, listOf(Alarm.EMPTY))
         with(alarm_container_recycler) {
             setHasFixedSize(true)
-            adapter = this@AlarmsFragment.adapter
+            adapter = Adapter(context, listOf(Alarm.EMPTY))
             layoutManager = LinearLayoutManager(activity, VERTICAL, false)
             itemAnimator = DefaultItemAnimator()
-        }
-
-        alarmsLiveData = (activity.application as Application).getViewModel().alarmsLiveData()
-        alarmsLiveData.observeForever { alarms: List<Alarm>? ->
-            if (alarms != null && alarms.isNotEmpty()) {
-                alarm_container_recycler.swapAdapter(Adapter(context, alarms),
-                        false)
-                this@AlarmsFragment.adapter = alarm_container_recycler.adapter as Adapter
-                updateNext()
-            }
         }
 
         activity.floating_action_btn.setOnClickListener { view ->
             println("$NAME: floating_action_btn onClick")
             (activity as AlarmActivity).onAlarmClick(Alarm.EMPTY)
         }
+
+        (activity as AlarmActivity).viewModel.getAlarms().observe(activity as AlarmActivity,
+                Observer<MutableList<Alarm>> { alarms ->
+                    if (alarms != null) {
+                        alarm_container_recycler.swapAdapter(Adapter(context, alarms),
+                                false)
+                    }
+                })
     }
 
-    override fun onResume() {
-        super.onResume()
-
-    }
-
-    private fun updateNext() {
-        Log.i(NAME, "updateNext()")
+    fun updateAdapter() {
+        Log.d(NAME, "updateAdapter()")
+        if (alarm_container_recycler.adapter != null) {
+            val liveData = (activity as AlarmActivity).viewModel.getAlarms()
+            alarm_container_recycler.adapter =
+                    Adapter(context, liveData.value ?: listOf(Alarm.EMPTY))
+        }
     }
 
     public fun toggleAlarm(alarm: Alarm) {

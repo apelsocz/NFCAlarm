@@ -1,14 +1,14 @@
 package com.pelsoczi.data
 
+import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.*
-import io.reactivex.Flowable
 
 
 @Dao
 interface AlarmDao {
 
     @Query("SELECT * FROM alarms")
-    fun loadAlarmsList(): Flowable<MutableList<Alarm>>
+    fun loadAlarmsList(): LiveData<MutableList<Alarm>>
 
     @Query("SELECT * FROM alarms WHERE id = :id LIMIT 1")
     fun loadAlarm(id: Long): Alarm

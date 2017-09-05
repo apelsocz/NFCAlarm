@@ -2,7 +2,6 @@ package com.pelsoczi.adam.tapthat.kotlin.ui
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.*
 import android.widget.TimePicker
 import com.pelsoczi.adam.tapthat.R
@@ -15,24 +14,23 @@ import java.util.*
 class EditFragment : Fragment(), View.OnClickListener {
     companion object {
         val NAME = AlarmsFragment::class.java.simpleName
-//        val ARGS_MODEL_ID = "ALARM_MODEL"
-//        fun newInstance(model: Alarm) = EditFragment()
-//        .apply { arguments = Bundle().apply { putLong(ARGS_MODEL_ID, alarm.id) } }
     }
+
     init {
         println("init{${EditFragment}}")
     }
 
     private lateinit var alarm: Alarm
+    private var cachedId: Long? = null
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return LayoutInflater.from(container?.context).inflate(R.layout.edit, container,
                 false)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setHasOptionsMenu(true)
@@ -50,6 +48,15 @@ class EditFragment : Fragment(), View.OnClickListener {
 
         if (savedInstanceState == null) {
             alarm = (activity.application as Application).getViewModel().getSelected()
+            if (alarm == Alarm.EMPTY) {
+                cachedId = System.currentTimeMillis()
+            }
+            else {
+                cachedId = alarm.id
+            }
+        }
+        else {
+            cachedId = savedInstanceState.getLong("id")
         }
         
         updateUi()
@@ -96,15 +103,14 @@ class EditFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val viewModel = (activity.application as Application).getViewModel()
-        alarm = toAlarmModel()
+        val model = toAlarmModel()
         
         when(item.itemId) {
             R.id.save -> {
-                viewModel.updateAlarms(listOf(alarm))
+                (activity as AlarmActivity).onEditUpdate(model)
             }
             R.id.delete -> {
-                viewModel.select(Alarm.EMPTY)
+                (activity as AlarmActivity).onEditDelete(alarm)
             }
         }
 
@@ -112,11 +118,13 @@ class EditFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
+        // todo implement this without saved instance state - using viewModel
         alarm = toAlarmModel()
+        outState?.putLong("id", cachedId ?: 0L)
+        super.onSaveInstanceState(outState)
     }
     
-    private fun toAlarmModel() = Alarm(System.currentTimeMillis(),
+    private fun toAlarmModel() = Alarm(cachedId ?: 0,
             edit_picker.hour,
             edit_picker.minute,
             edit_active.isChecked,
@@ -130,7 +138,7 @@ class EditFragment : Fragment(), View.OnClickListener {
             edit_repeat_sat.isChecked
     )
 
-    override fun onClick(view: View?) {
+    override fun onClick(view: View) {
         if (view == edit_repeat_once) {
             if (edit_repeat_once.isChecked) {
                 edit_repeat_sun.isChecked = false
@@ -155,8 +163,6 @@ class EditFragment : Fragment(), View.OnClickListener {
                 edit_repeat_once.isChecked = true
             }
         }
-
-        Log.d(NAME, "Model.EMPTY = " + (alarm == Alarm.EMPTY))
     }
 
 }
