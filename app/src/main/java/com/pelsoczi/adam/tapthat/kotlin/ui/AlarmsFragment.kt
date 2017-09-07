@@ -73,23 +73,11 @@ class AlarmsFragment : Fragment() {
 
         (activity as AlarmActivity).viewModel.getAlarms().observe(activity as AlarmActivity,
                 Observer<MutableList<Alarm>> { alarms ->
+                    Log.v(NAME, "observed alarmsfragment")
                     if (alarms != null) {
                         alarm_container_recycler.swapAdapter(Adapter(context, alarms),
                                 false)
                     }
                 })
-    }
-
-    fun updateAdapter() {
-        Log.d(NAME, "updateAdapter()")
-        if (alarm_container_recycler.adapter != null) {
-            val liveData = (activity as AlarmActivity).viewModel.getAlarms()
-            alarm_container_recycler.adapter =
-                    Adapter(context, liveData.value ?: listOf(Alarm.EMPTY))
-        }
-    }
-
-    public fun toggleAlarm(alarm: Alarm) {
-        // viewmodel toggle isactive and recalculate next
     }
 }

@@ -6,6 +6,7 @@ import android.content.Context;
 import com.pelsoczi.adam.tapthat.MyApplication;
 import com.pelsoczi.adam.tapthat.model.AlarmModel;
 import com.pelsoczi.adam.tapthat.util.Data;
+import com.pelsoczi.data.Alarm;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -164,7 +165,8 @@ public class AlarmDAO implements DAOInterface {
                                 calModel.add(Calendar.DAY_OF_YEAR, i);
                                 dateModel = calModel.getTime();
 
-                                if (Data.isDayActive(calModel.get(Calendar.DAY_OF_WEEK), model)) {
+//                                if (Data.isDayActive(calModel.get(Calendar.DAY_OF_WEEK), model)) {
+                                if (Data.isDayActive(calModel.get(Calendar.DAY_OF_WEEK), Alarm.Companion.getEMPTY())) {
                                     if (dateModel.after(dateNow)) {
                                         // loop until first active model date after now
                                         iterate = false;

@@ -1,6 +1,7 @@
 package com.pelsoczi.adam.tapthat.util;
 
 import com.pelsoczi.adam.tapthat.model.AlarmModel;
+import com.pelsoczi.data.Alarm;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,29 +47,29 @@ public class Data {
         return found;
     }
 
-    public static boolean isDayActive(int dayOfWeek, AlarmModel model) {
+    public static boolean isDayActive(int dayOfWeek, Alarm model) {
         boolean active = false;
 
         if (dayOfWeek == Calendar.SUNDAY) {
-            active = model.sunday;
+            active = model.getSunday();
         }
         else if (dayOfWeek == Calendar.MONDAY) {
-            active = model.monday;
+            active = model.getMonday();
         }
         else if (dayOfWeek == Calendar.TUESDAY) {
-            active = model.tuesday;
+            active = model.getTuesday();
         }
         else if (dayOfWeek == Calendar.WEDNESDAY) {
-            active = model.wednesday;
+            active = model.getWednesday();
         }
         else if (dayOfWeek == Calendar.THURSDAY) {
-            active = model.thursday;
+            active = model.getThursday();
         }
         else if (dayOfWeek == Calendar.FRIDAY) {
-            active = model.friday;
+            active = model.getFriday();
         }
         else if (dayOfWeek == Calendar.SATURDAY) {
-            active = model.saturday;
+            active = model.getSaturday();
         }
         return active;
     }

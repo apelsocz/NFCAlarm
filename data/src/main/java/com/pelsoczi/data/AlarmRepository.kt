@@ -21,6 +21,10 @@ class AlarmRepository(context: Context) {
         return list
     }
 
+    fun getAlarmById(id: Long): Alarm {
+        return database.alarmDao().loadAlarm(id)
+    }
+
     fun insertAlarms(alarms: MutableList<Alarm>) {
         AppExecutors.DISK().execute {
             database.alarmDao().insertAlarms(alarms)

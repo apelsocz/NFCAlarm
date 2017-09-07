@@ -47,7 +47,9 @@ public class Adapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         private void update(Alarm model) {
-            //todo model isEmpty
+            if (model == Alarm.Companion.getEMPTY()) {
+                return;
+            }
             
             this.model = model;
             itemView.setOnClickListener(this);

@@ -61,9 +61,10 @@ class AlarmActivity : AppCompatActivity(), LifecycleRegistryOwner {
     }
 
     fun onActiveToggle(alarm: Alarm) {
-        val alarmFragment: AlarmsFragment = supportFragmentManager
-                .findFragmentByTag(AlarmsFragment.NAME) as AlarmsFragment
-        alarmFragment.toggleAlarm(alarm)
+//        val alarmFragment: AlarmsFragment = supportFragmentManager
+//                .findFragmentByTag(AlarmsFragment.NAME) as AlarmsFragment
+//        alarmFragment.toggleAlarm(alarm)
+        viewModel.toggleAlarm(alarm)
     }
 
     fun onEditUpdate(alarm: Alarm) {

@@ -17,7 +17,7 @@ interface AlarmDao {
     fun insertAlarms(alarms: MutableList<Alarm>)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun updateAlarms(alarms: MutableList<Alarm>)
+    fun updateAlarms(alarms: MutableList<Alarm>): Int
 
     @Delete
     fun deleteAlarms(alarms: MutableList<Alarm>)

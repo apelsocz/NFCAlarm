@@ -14,7 +14,7 @@ public class PreferencesManager {
     private final Context mContext;
     private final SharedPreferences mPref;
 
-    private PreferencesManager(Context context) {
+    public PreferencesManager(Context context) {
         mContext = context;
         mPref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
