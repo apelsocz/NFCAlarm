@@ -103,11 +103,9 @@ class EditFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val model = toAlarmModel()
-        
         when(item.itemId) {
             R.id.save -> {
-                (activity as AlarmActivity).onEditUpdate(model)
+                (activity as AlarmActivity).onEditUpdate(toAlarmModel())
             }
             R.id.delete -> {
                 (activity as AlarmActivity).onEditDelete(alarm)
@@ -136,7 +134,7 @@ class EditFragment : Fragment(), View.OnClickListener {
             edit_repeat_thu.isChecked,
             edit_repeat_fri.isChecked,
             edit_repeat_sat.isChecked
-    )
+    ).also { println("toAlarmModel() ${it.id}") }
 
     override fun onClick(view: View) {
         if (view == edit_repeat_once) {

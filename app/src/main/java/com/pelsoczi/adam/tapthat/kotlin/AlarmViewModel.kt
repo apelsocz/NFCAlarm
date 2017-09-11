@@ -1,8 +1,8 @@
 package com.pelsoczi.adam.tapthat.kotlin
 
-import android.annotation.SuppressLint
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.util.Log
 import com.pelsoczi.adam.tapthat.data.PreferencesManager
@@ -16,26 +16,33 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
     val NAME = "AlarmViewModel"
 
     private val alarmRepository: AlarmRepository
-    private var alarmLiveData: LiveData<MutableList<Alarm>>
+    private val sharedPreferences = getApplication<Application>().applicationContext
+            .getSharedPreferences(PreferencesManager.PREF_NAME, Context.MODE_PRIVATE)
 
-    private var scheduled = Alarm.EMPTY
+    private var alarmLiveData: LiveData<MutableList<Alarm>>
+    private var scheduled = MutableLiveData<Alarm>()
+
     private var selected = Alarm.EMPTY
 
     init {
         Log.wtf(NAME, "init{$NAME}")
 
         alarmRepository = AlarmRepository(application.applicationContext)
-        alarmLiveData = alarmRepository.getAlarmsList()
 
+        alarmLiveData = alarmRepository.getAlarmsList()
         alarmLiveData.observeForever { alarms ->
-            if (alarms != null && alarms.size > 0) {
-                Log.v(NAME, "$NAME observed ${alarmLiveData.value?.size} alarms")
+            Log.v(NAME, "livedata alarm list observed:")
+            if (alarms != null) {
+                Log.v(NAME, "$NAME observed ${alarms.size} Alarms")
+                alarms.forEach { println("Alarm: ${it.id}, ${it.hour}:${it.minute}") }
                 updateScheduled(alarms)
             }
         }
     }
 
     fun getAlarms() = alarmLiveData
+
+    fun getScheduled() = scheduled
 
     fun updateAlarm(alarm: Alarm) {
         if (alarm != Alarm.EMPTY) {
@@ -59,11 +66,114 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
         updateAlarm(toggledAlarm)
     }
 
+    private fun updateScheduled(alarms: MutableList<Alarm>?) {
+        println("| updateScheduled()")
+
+        var nextScheduled = Alarm.EMPTY
+        var millis = 0L
+
+        val listOfActiveAlarms = alarms?.filter { alarm -> alarm.active }
+
+        if (listOfActiveAlarms != null && listOfActiveAlarms.isNotEmpty()) {
+            println("| ${listOfActiveAlarms.size} active alarms")
+
+            var calNext = Calendar.getInstance()
+            var calNow = Calendar.getInstance()
+            var calModel = Calendar.getInstance()
+
+            calNext.timeInMillis = 0L
+            calNow.timeInMillis = System.currentTimeMillis()
+            calModel.timeInMillis = System.currentTimeMillis()
+
+            var dateNext: Date = calNext.time
+            var dateNow: Date = calNow.time
+            var dateModel: Date
+
+            println("| begin for each..")
+
+            listOfActiveAlarms.forEach {
+                // reset model Calendar
+                calModel.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR))
+                calModel.set(Calendar.HOUR_OF_DAY, 0)
+                calModel.set(Calendar.MINUTE, 0)
+                calModel.set(Calendar.SECOND, 5)
+
+                // recompute Calendar internal fields
+                dateModel = calModel.time
+
+                // initialize Calendar and Date to model values
+                val hourOfDay = it.hour
+                val minute = it.minute
+                calModel.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                calModel.set(Calendar.MINUTE, minute)
+                dateModel = calModel.time
+
+                println("| ready for ${it.toString()}")
+
+                if (it.once) {
+                    if (dateModel.before(dateNow)) {
+                        calModel.add(Calendar.DAY_OF_YEAR, 1)
+                        dateModel = calModel.time
+                    }
+                } else {
+                    // amount of days to increment
+                    var i = 0
+                    var iterate = true
+                    do {
+                        // refresh model calendar to today and increment by i
+                        calModel.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR))
+                        calModel.add(Calendar.DAY_OF_YEAR, i)
+                        dateModel = calModel.time
+
+                        if (Data.isDayActive(calModel.get(Calendar.DAY_OF_WEEK), it)) {
+                            if (dateModel.after(dateNow)) {
+                                // loop until first active model date after now
+                                iterate = false
+                            }
+                        }
+                        i++
+                    } while (iterate)
+                }
+
+                // assign dateNext
+                if (dateNext.time == 0L) {
+                    // assign knowing that dateModel is more ideal
+                    dateNext = dateModel
+                    nextScheduled = it
+                } else {
+                    // assign, if dateModel is after dateNow && before current assignment
+                    dateNext = if (dateModel.after(dateNow) && dateModel.before(dateNext))
+                        dateModel
+                    else
+                        dateNext
+
+                    nextScheduled = if (dateNext.compareTo(dateModel) == 0) it else nextScheduled
+                }
+            }
+            millis = dateNext.time
+        }
+        else {
+            println("| nothing to update")
+        }
+
+        sharedPreferences.edit()
+                .putLong(PreferencesManager.KEY_VALUE_ID, nextScheduled.id)
+                .putLong(PreferencesManager.KEY_VALUE_MILLIS, millis)
+                .commit()
+
+        scheduled.postValue(nextScheduled)
+
+        println("| updateScheduled() = ${nextScheduled.toString()} at $millis")
+    }
+
+    fun getScheduledMillis(): Long {
+        return sharedPreferences.getLong(PreferencesManager.KEY_VALUE_MILLIS, 0L)
+    }
+
     fun select(alarm: Alarm) {
         if (alarm == Alarm.EMPTY) {
             selected = Alarm.EMPTY
-        }
-        else {
+        } else {
             val index = alarmLiveData.value?.indexOf(alarm)
             if (index != null && index != -1) {
                 selected = alarmLiveData.value?.get(index) ?: Alarm.EMPTY
@@ -73,111 +183,7 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getSelected() = selected
 
-    fun resetSelected() { selected = Alarm.EMPTY }
-
-    private fun updateScheduled(alarms: MutableList<Alarm>?) {
-        var idNext = Alarm.EMPTY.id
-
-        if (alarms != null) {
-            alarms.forEach { alarm: Alarm ->
-                if (!alarm.active) alarms.remove(alarm)
-            }
-            if (alarms.isNotEmpty()) {
-                var calNext = Calendar.getInstance()
-                var calNow = Calendar.getInstance()
-                var calModel = Calendar.getInstance()
-
-                calNext.timeInMillis = 0L
-                calNow.timeInMillis = System.currentTimeMillis()
-                calModel.timeInMillis = System.currentTimeMillis()
-
-                var dateNext: Date = calNext.time
-                var dateNow: Date = calNow.time
-                var dateModel: Date
-
-                alarms.forEach { activeAlarm: Alarm ->
-                    // reset model Calendar
-                    calModel.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR))
-                    calModel.set(Calendar.HOUR_OF_DAY, 0)
-                    calModel.set(Calendar.MINUTE, 0)
-                    calModel.set(Calendar.SECOND, 5)
-
-                    // recompute Calendar internal fields
-                    dateModel = calModel.time
-
-                    // initialize Calendar and Date to model values
-                    val hourOfDay = activeAlarm.hour
-                    val minute = activeAlarm.minute
-                    calModel.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                    calModel.set(Calendar.MINUTE, minute)
-                    dateModel = calModel.time
-
-                    if (activeAlarm.once) {
-                        if (dateModel.before(dateNow)) {
-                            calModel.add(Calendar.DAY_OF_YEAR, 1)
-                            dateModel = calModel.time
-                        }
-                    }
-                    else {
-                        // amount of days to increment
-                        var i = 0
-                        var iterate = true
-
-                        do {
-                            // refresh model calendar to today and increment by i
-                            calModel.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR))
-                            calModel.add(Calendar.DAY_OF_YEAR, i)
-                            dateModel = calModel.time
-
-                            if (Data.isDayActive(calModel.get(Calendar.DAY_OF_WEEK), activeAlarm)) {
-                                if (dateModel.after(dateNow)) {
-                                    // loop until first active model date after now
-                                    iterate = false
-                                }
-                            }
-                            i++
-                        }
-                        while (iterate)
-                    }
-
-                    // assign dateNext
-                    if (dateNext.time == 0L) {
-                        // assign knowing that dateModel is more ideal
-                        dateNext = dateModel
-                        idNext = activeAlarm.id
-                    }
-                    else {
-                        // assign, if dateModel is after dateNow && before current assignment
-                        dateNext = if (dateModel.after(dateNow) && dateModel.before(dateNext))
-                            dateModel
-                        else
-                            dateNext
-
-                        idNext = if (dateNext.compareTo(dateModel) == 0) activeAlarm.id else idNext
-                    }
-                }
-//                setScheduled(idNext, dateNext.time)
-            }
-            else {
-                // alarms is empty - write Alarm.EMPTY for next scheduled
-//                setScheduled(Alarm.EMPTY.id, 0L)
-            }
-        }
+    fun resetSelected() {
+        selected = Alarm.EMPTY
     }
-
-    @SuppressLint("ApplySharedPref")
-    private fun setScheduled(idOfNext: Long, timeInMillis: Long) {
-        val context = (getApplication<Application>() as Application).applicationContext
-
-        val result = context.getSharedPreferences(PreferencesManager.PREF_NAME, Context.MODE_PRIVATE)
-                .edit()
-                .putLong(PreferencesManager.KEY_VALUE_ID, idOfNext)
-                .putLong(PreferencesManager.KEY_VALUE_MILLIS, timeInMillis)
-                .commit()
-
-        scheduled = alarmRepository.getAlarmById(idOfNext)
-        // todo scheduling retrieve of next scheduled alarm
-    }
-
-
 }

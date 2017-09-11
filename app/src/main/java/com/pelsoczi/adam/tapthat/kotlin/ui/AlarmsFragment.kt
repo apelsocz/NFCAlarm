@@ -16,6 +16,7 @@ import android.widget.TextView
 import android.widget.ViewSwitcher
 import com.pelsoczi.adam.tapthat.R
 import com.pelsoczi.adam.tapthat.ui.Adapter
+import com.pelsoczi.adam.tapthat.util.Format
 import com.pelsoczi.data.Alarm
 import kotlinx.android.synthetic.main.activity_application.*
 import kotlinx.android.synthetic.main.alarms_fragment.*
@@ -66,18 +67,33 @@ class AlarmsFragment : Fragment() {
             itemAnimator = DefaultItemAnimator()
         }
 
-        activity.floating_action_btn.setOnClickListener { view ->
+        activity.floating_action_btn.setOnClickListener {
+            view ->
             println("$NAME: floating_action_btn onClick")
             (activity as AlarmActivity).onAlarmClick(Alarm.EMPTY)
         }
 
-        (activity as AlarmActivity).viewModel.getAlarms().observe(activity as AlarmActivity,
-                Observer<MutableList<Alarm>> { alarms ->
-                    Log.v(NAME, "observed alarmsfragment")
-                    if (alarms != null) {
-                        alarm_container_recycler.swapAdapter(Adapter(context, alarms),
-                                false)
-                    }
-                })
+        val alarmActivity = activity as AlarmActivity
+        alarmActivity.viewModel.getAlarms().observe(alarmActivity, Observer<MutableList<Alarm>> {
+            alarms ->
+            if (alarms != null) {
+                with(alarm_container_recycler) {
+                    swapAdapter(Adapter(context, alarms), false)
+                }
+            }
+        })
+        alarmActivity.viewModel.getScheduled().observe(alarmActivity, Observer<Alarm> {
+            alarm ->
+            if (alarm != null) {
+                if (alarm == Alarm.EMPTY) {
+                    ac_next_date.setText(getString(R.string.title_next_empty))
+                    ac_next_time.setText("")
+                } else {
+                    val millis = (activity as AlarmActivity).viewModel.getScheduledMillis()
+                    ac_next_date.setText(Format.formatDate(millis))
+                    ac_next_time.setText(Format.formatTime(millis))
+                }
+            }
+        })
     }
 }

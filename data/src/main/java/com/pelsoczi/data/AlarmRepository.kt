@@ -2,6 +2,7 @@ package com.pelsoczi.data
 
 import android.app.Application
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.util.Log
 
@@ -21,8 +22,9 @@ class AlarmRepository(context: Context) {
         return list
     }
 
-    fun getAlarmById(id: Long): Alarm {
-        return database.alarmDao().loadAlarm(id)
+    fun getAlarmById(id: Long): MutableLiveData<Alarm> {
+        val alarm = database.alarmDao().loadAlarm(id)
+        return alarm as MutableLiveData<Alarm>
     }
 
     fun insertAlarms(alarms: MutableList<Alarm>) {

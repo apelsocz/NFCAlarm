@@ -31,6 +31,10 @@ data class Alarm @Ignore constructor(
             saturday = false)
 
     init {
-        Log.wtf(NAME, "init{$id}")
+        Log.wtf(NAME, "init{${toString()}}")
+    }
+
+    override fun toString(): String {
+        return "<Alarm> id=${id}, time=$hour:$minute"
     }
 }

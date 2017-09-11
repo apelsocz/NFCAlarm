@@ -11,7 +11,7 @@ interface AlarmDao {
     fun loadAlarmsList(): LiveData<MutableList<Alarm>>
 
     @Query("SELECT * FROM alarms WHERE id = :id LIMIT 1")
-    fun loadAlarm(id: Long): Alarm
+    fun loadAlarm(id: Long): LiveData<Alarm>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAlarms(alarms: MutableList<Alarm>)
